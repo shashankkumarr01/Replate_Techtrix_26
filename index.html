@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>RePlate - Smart Food Saver</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ================= NAVIGATION ================= -->
+<header class="navbar">
+    <div class="logo">RePlate</div>
+    <nav>
+        <ul>
+            <li><a href="#dashboard">Dashboard</a></li>
+            <li><a href="#recipes">Recipes</a></li>
+            <li><a href="#analytics">Analytics</a></li>
+            <li><a href="#challenge">Challenge</a></li>
+        </ul>
+    </nav>
+    <button class="cta-btn">Start Saving Food</button>
+</header>
+
+
+<!-- ================= HERO SECTION ================= -->
+<section class="hero">
+    <div class="hero-content">
+        <h1>Turn Leftovers Into Delicious Possibilities.</h1>
+        <p>Track your food, reduce waste, and save money with AI-powered smart suggestions for your family.</p>
+        <button class="primary-btn">Explore Dashboard</button>
+    </div>
+</section>
+
+
+<!-- ================= DASHBOARD ================= -->
+<section id="dashboard" class="dashboard">
+    <h2>Good Evening, Kumar Family 👋</h2>
+
+    <div class="stats-grid">
+        <div class="card">
+            <i class="fa-solid fa-bowl-food"></i>
+            <h3>4</h3>
+            <p>Leftovers</p>
+        </div>
+
+        <div class="card warning">
+            <i class="fa-solid fa-clock"></i>
+            <h3>2</h3>
+            <p>Expiring Soon</p>
+        </div>
+
+        <div class="card success">
+            <i class="fa-solid fa-indian-rupee-sign"></i>
+            <h3>₹420</h3>
+            <p>Saved This Month</p>
+        </div>
+
+        <div class="card eco">
+            <i class="fa-solid fa-leaf"></i>
+            <h3>2.1kg</h3>
+            <p>CO₂ Reduced</p>
+        </div>
+    </div>
+
+    <h3 class="section-title">Today's Leftovers</h3>
+
+    <div class="leftover-grid">
+
+        <div class="food-card">
+            <img src="/images/rice.jpg" alt="Rice">
+            <div class="food-info">
+                <h4>Rice</h4>
+                <p>2 Servings</p>
+                <span class="badge urgent">Use within 24 hrs</span>
+                <button class="secondary-btn">View Recipes</button>
+            </div>
+        </div>
+
+        <div class="food-card">
+            <img src="/images/paneer_curry.jpg" alt="Paneer Curry">
+            <div class="food-info">
+                <h4>Paneer Curry</h4>
+                <p>1 Bowl</p>
+                <span class="badge safe">Fresh</span>
+                <button class="secondary-btn">View Recipes</button>
+            </div>
+        </div>
+
+    </div>
+
+    <button class="floating-btn">
+        <i class="fa-solid fa-plus"></i>
+    </button>
+</section>
+
+
+<!-- ================= RECIPES SECTION ================= -->
+<section id="recipes" class="recipes">
+    <h2>AI Recipe Suggestions</h2>
+
+    <div class="recipe-grid">
+
+        <div class="recipe-card">
+            <img src="/images/fried_rice.jpg" alt="Fried Rice">
+            <h4>Vegetable Fried Rice</h4>
+            <p>15 mins • Easy</p>
+            <button class="primary-btn">Cook Now</button>
+        </div>
+
+        <div class="recipe-card">
+            <img src="/images/rice_cutlet.jpg" alt="Rice Cutlet">
+            <h4>Rice Cutlets</h4>
+            <p>20 mins • Medium</p>
+            <button class="primary-btn">Cook Now</button>
+        </div>
+
+        <div class="recipe-card">
+            <img src="/images/lemon_rice.jpg" alt="Lemon Rice">
+            <h4>Lemon Rice</h4>
+            <p>10 mins • Easy</p>
+            <button class="primary-btn">Cook Now</button>
+        </div>
+
+    </div>
+</section>
+
+
+<!-- ================= ANALYTICS SECTION ================= -->
+<section id="analytics" class="analytics">
+    <h2>Waste Analytics</h2>
+
+    <div class="analytics-grid">
+        <div class="analytics-card">
+            <h4>Most Wasted Item</h4>
+            <p>Rice (40%)</p>
+        </div>
+
+        <div class="analytics-card">
+            <h4>Weekly Improvement</h4>
+            <p>18% Reduction</p>
+        </div>
+
+        <div class="analytics-card insight">
+            <h4>Smart Insight</h4>
+            <p>You waste more rice on weekends. Consider cooking smaller portions.</p>
+        </div>
+    </div>
+</section>
+
+
+<!-- ================= ZERO WASTE CHALLENGE ================= -->
+<section id="challenge" class="challenge">
+    <h2>Zero Waste Family Challenge 🏆</h2>
+
+    <div class="challenge-box">
+        <p>3 Days Without Waste</p>
+        <div class="progress-bar">
+            <div class="progress"></div>
+        </div>
+        <span class="badge success">Bronze Badge Earned</span>
+    </div>
+</section>
+
+
+<!-- ================= FOOTER ================= -->
+<footer class="footer">
+    <p>© 2026 RePlate – Smart Food Saver | Designed by Team 10</p>
+</footer>
+
+
+<!-- JS -->
+<script src="script.js"></script>
+
+</body>
+</html>
