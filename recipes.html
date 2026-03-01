@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Recipes – RePlate</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="global.css">
+    <style>
+        .recipes-wrap { max-width: 1280px; margin: 0 auto; padding: 90px 5% 60px; }
+        
+        .filter-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+        }
+        .filter-row .search-box {
+            flex: 1;
+            min-width: 200px;
+            position: relative;
+        }
+        .filter-row .search-box i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--muted); }
+        .filter-row input {
+            width: 100%;
+            padding: 12px 14px 12px 42px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 14px;
+            font-family: 'DM Sans', sans-serif;
+            outline: none;
+            transition: border-color 0.2s;
+            background: white;
+        }
+        .filter-row input:focus { border-color: var(--green); }
+        .filter-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+        .chip {
+            padding: 8px 16px;
+            border-radius: 100px;
+            border: 2px solid var(--border);
+            background: white;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'DM Sans', sans-serif;
+            white-space: nowrap;
+        }
+        .chip.active, .chip:hover { background: var(--green); color: white; border-color: var(--green); }
+
+        /* FEATURED RECIPE */
+        .featured-recipe {
+            background: linear-gradient(135deg, #1B5E20 0%, #2E7D32 100%);
+            border-radius: 24px;
+            padding: 40px;
+            margin-bottom: 40px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            color: white;
+        }
+        .featured-recipe::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        .featured-tag { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.2); padding: 6px 12px; border-radius: 100px; font-size: 12px; font-weight: 600; margin-bottom: 16px; }
+        .featured-recipe h2 { font-size: clamp(24px, 3vw, 38px); margin-bottom: 12px; }
+        .featured-recipe p { opacity: 0.85; font-size: 15px; line-height: 1.6; margin-bottom: 20px; }
+        .recipe-meta { display: flex; gap: 20px; margin-bottom: 24px; }
+        .recipe-meta-item { display: flex; align-items: center; gap: 6px; font-size: 14px; opacity: 0.9; }
+        .featured-img { border-radius: 18px; overflow: hidden; height: 260px; }
+        .featured-img img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* RECIPE GRID */
+        .section-title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .section-title-row h2 { font-size: 22px; }
+        .recipe-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+        .recipe-card {
+            background: white;
+            border-radius: 18px;
+            overflow: hidden;
+            border: 1.5px solid var(--border);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+        .recipe-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); border-color: var(--green); }
+        .recipe-card-img { position: relative; height: 180px; overflow: hidden; }
+        .recipe-card-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s; }
+        .recipe-card:hover .recipe-card-img img { transform: scale(1.05); }
+        .recipe-card-img .rc-badge {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: white;
+            border-radius: 8px;
+            padding: 4px 10px;
+            font-size: 12px;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+        }
+        .recipe-card-img .rc-save {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 32px;
+            height: 32px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+            transition: var(--transition);
+            border: none;
+        }
+        .recipe-card-img .rc-save:hover { background: #FFEBEE; color: var(--red); }
+        .recipe-card-img .rc-save.saved { background: #FFEBEE; color: var(--red); }
+        .recipe-card-body { padding: 16px; }
+        .recipe-card-body h3 { font-size: 16px; margin-bottom: 6px; }
+        .recipe-card-body .rc-meta { display: flex; gap: 14px; font-size: 12px; color: var(--muted); margin-bottom: 12px; }
+        .rc-meta-item { display: flex; align-items: center; gap: 4px; }
+        .recipe-card-body .ingredients-used { font-size: 12px; color: var(--green); font-weight: 600; margin-bottom: 12px; }
+        .recipe-card-footer { display: flex; gap: 8px; }
+        .btn-sm { padding: 8px 14px; font-size: 13px; border-radius: 8px; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; font-weight: 600; transition: var(--transition); }
+        .btn-sm-green { background: var(--green); color: white; flex: 1; }
+        .btn-sm-green:hover { background: var(--green-dark); }
+        .btn-sm-outline { background: transparent; color: var(--muted); border: 1.5px solid var(--border); }
+        .btn-sm-outline:hover { border-color: var(--green); color: var(--green); }
+
+        /* RECIPE MODAL */
+        .recipe-modal-content { max-width: 600px; }
+        .recipe-detail-img { width: 100%; height: 220px; object-fit: cover; border-radius: 16px; margin-bottom: 20px; }
+        .recipe-detail-meta { display: flex; gap: 20px; margin-bottom: 20px; flex-wrap: wrap; }
+        .rdm-item { text-align: center; }
+        .rdm-item strong { display: block; font-size: 18px; color: var(--green); }
+        .rdm-item span { font-size: 12px; color: var(--muted); }
+        .steps-list { counter-reset: steps; display: flex; flex-direction: column; gap: 12px; }
+        .step-item {
+            display: flex;
+            gap: 14px;
+            padding: 14px;
+            background: var(--bg);
+            border-radius: 12px;
+        }
+        .step-num {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--green);
+            color: white;
+            font-weight: 700;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .step-item p { font-size: 14px; line-height: 1.6; }
+        .ingredient-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
+        .ingredient-tag {
+            background: #E8F5E9;
+            color: var(--green);
+            padding: 4px 12px;
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .featured-recipe { grid-template-columns: 1fr; }
+            .featured-img { height: 200px; }
+        }
+        @media (max-width: 480px) {
+            .recipe-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar" id="navbar">
+    <div class="nav-inner">
+        <a href="index.html" class="logo">Re<span>Plate</span></a>
+        <ul class="nav-links">
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="recipes.html">Recipes</a></li>
+            <li><a href="analytics.html">Analytics</a></li>
+            <li><a href="challenge.html">Challenge</a></li>
+            <li><a href="inventory.html">Inventory</a></li>
+        </ul>
+        <div class="nav-actions">
+            <a href="dashboard.html" class="btn-primary">Dashboard</a>
+            <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+        </div>
+    </div>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+    <ul>
+        <li><a href="dashboard.html">Dashboard</a></li>
+        <li><a href="recipes.html">Recipes</a></li>
+        <li><a href="analytics.html">Analytics</a></li>
+        <li><a href="challenge.html">Challenge</a></li>
+        <li><a href="inventory.html">Inventory</a></li>
+    </ul>
+</div>
+
+<div class="recipes-wrap">
+
+    <div class="page-header" style="padding:0;border:none;margin-bottom:28px;">
+        <div class="breadcrumb"><a href="index.html">Home</a> <i class="fa-solid fa-chevron-right" style="font-size:10px;"></i> Recipes</div>
+        <h1>AI Recipe Suggestions ✨</h1>
+        <p>Smart recipes based on your current leftovers. No waste, just taste!</p>
+    </div>
+
+    <!-- FILTERS -->
+    <div class="filter-row reveal">
+        <div class="search-box">
+            <i class="fa-solid fa-search"></i>
+            <input type="text" id="recipeSearch" placeholder="Search recipes..." oninput="filterRecipes()">
+        </div>
+        <div class="filter-chips">
+            <button class="chip active" onclick="setFilter(this, 'all')">All</button>
+            <button class="chip" onclick="setFilter(this, 'easy')">Easy</button>
+            <button class="chip" onclick="setFilter(this, 'medium')">Medium</button>
+            <button class="chip" onclick="setFilter(this, 'rice')">Rice Recipes</button>
+            <button class="chip" onclick="setFilter(this, 'roti')">Roti Recipes</button>
+            <button class="chip" onclick="setFilter(this, 'quick')">Under 15 min</button>
+        </div>
+    </div>
+
+    <!-- FEATURED -->
+    <div class="featured-recipe reveal">
+        <div>
+            <div class="featured-tag"><i class="fa-solid fa-fire"></i> Featured Today</div>
+            <h2>Vegetable Fried Rice</h2>
+            <p>A quick and delicious recipe using your leftover rice. Add any vegetables you have on hand for a nutritious meal.</p>
+            <div class="recipe-meta">
+                <div class="recipe-meta-item"><i class="fa-regular fa-clock"></i> 15 minutes</div>
+                <div class="recipe-meta-item"><i class="fa-solid fa-gauge-simple-high"></i> Easy</div>
+                <div class="recipe-meta-item"><i class="fa-solid fa-users"></i> 2 servings</div>
+            </div>
+            <button class="btn-primary" style="background:white;color:var(--green);" onclick="openRecipeModal('fried-rice')">
+                Cook Now <i class="fa-solid fa-arrow-right"></i>
+            </button>
+        </div>
+        <div class="featured-img">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRCmYaBQX9pZlzzuPDDTOd8Zxgo0XIPxgyzyQ&s" alt="Fried Rice" loading="lazy">
+        </div>
+    </div>
+
+    <!-- RECIPE GRID -->
+    <div class="section-title-row reveal">
+        <h2>All Recipes for Your Kitchen</h2>
+        <span id="recipeCount" style="color:var(--muted);font-size:14px;">6 recipes found</span>
+    </div>
+
+    <div class="recipe-grid reveal" id="recipeGrid">
+        <div class="recipe-card" data-name="Vegetable Fried Rice" data-diff="easy" data-time="15" data-type="rice">
+            <div class="recipe-card-img">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRCmYaBQX9pZlzzuPDDTOd8Zxgo0XIPxgyzyQ&s" alt="Fried Rice" loading="lazy">
+                <span class="rc-badge">🍚 Uses Rice</span>
+                <button class="rc-save" onclick="toggleSave(this)"><i class="fa-regular fa-heart"></i></button>
+            </div>
+            <div class="recipe-card-body">
+                <h3>Vegetable Fried Rice</h3>
+                <div class="rc-meta">
+                    <div class="rc-meta-item"><i class="fa-regular fa-clock"></i> 15 min</div>
+                    <div class="rc-meta-item"><i class="fa-solid fa-gauge-simple-high"></i> Easy</div>
+                    <div class="rc-meta-item"><i class="fa-solid fa-fire"></i> 320 cal</div>
+                </div>
+                <p class="ingredients-used">✓ Uses: Rice, Vegetables</p>
+                <div class="recipe-card-footer">
+                    <button class="btn-sm btn-sm-green" onclick="openRecipeModal('fried-rice')">Cook Now</button>
+                    <button class="btn-sm btn-sm-outline"><i class="fa-regular fa-bookmark"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <div class="recipe-card" data-name="Rice Cutlets" data-diff="medium" data-time="20" data-type="rice">
+            <div class="recipe-card-img">
+                <img src="https://www.indianveggiedelight.com/wp-content/uploads/2017/06/final_1_rice_cutlet-min.jpg" alt="Rice Cutlets" loading="lazy">
+                <span class="rc-badge">🍚 Uses Rice</span>
+                <button class="rc-save" onclick="toggleSave(this)"><i class="fa-regular fa-heart"></i></button>
+            </div>
+            <div class="recipe-card-body">
+                <h3>Rice Cutlets</h3>
+                <div class="rc-meta">
+                    <div class="rc-meta-item"><i class="fa-regular fa-clock"></i> 20 min</div>
+                    <div class="rc-meta-item"><i class="fa-solid fa-gauge-simple-high"></i> Medium</div>
+                    <div class="rc-meta-item"><i class="fa-solid fa-fire"></i> 180 cal</div>
+                </div>
+                <p class="ingredients-used">✓ Uses: Rice</p>
+                <div class="recipe-card-footer">
+                    <button class="btn-sm btn-sm-green" onclick="openRecipeModal('rice-cutlets')">Cook Now</button>
+                    <button class="btn-sm btn-sm-outline"><i class="fa-regular fa-bookmark"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <div class="recipe-card" data-name="Lemon Rice" data-diff="easy" data-time="10" data-type="rice">
+            <div class="recipe-card-img">
+                <img src="https://static.toiimg.com/thumb/53870704.cms?width=1200&height=900" alt="Lemon Rice" loading="lazy">
+                <span class="rc-badge">🍚 Uses Rice</span>
+                <button class="rc-save" onclick="toggleSave(this)"><i class="fa-regular fa-heart"></i></button>
+            </div>
+            <div class="recipe-card-body">
+                <h3>Lemon Rice</h3>
+                <div class="rc-meta">
+                    <div class="rc-meta-item"><i class="fa-regular fa-clock"></i> 10 min</div>
+                    <div class="rc-meta-item"><i class="fa-solid fa-gauge-simple-high"></i> Easy</div>
+                    <div class="rc-meta-item"><i class="fa-solid fa-fire"></i> 280 cal</div>
+                </div>
+                <p class="ingredients-used">✓ Uses: Rice</p>
+                <div class="recipe-card-footer">
+                    <button class="btn-sm btn-sm-green" onclick="openRecipeModal('lemon-rice')">Cook Now</button>
+                    <button class="btn-sm btn-sm-outline"><i class="fa-regular fa-bookmark"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <div class="recipe-card" data-name="Roti Pizza" data-diff="easy" data-time="10" data-type="roti">
+            <div class="recipe-card-img">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSHcq6uzEWOQYx4ikbb7KPm-vwXg-mHHwQ1nw&s" alt="Roti Pizza" loading="lazy">
+                <span class="rc-badge">🫓 Uses Roti</span>
+                <button class="rc-save" onclick="toggleSave(this)"><i class="fa-regular fa-heart"></i></button>
+            </div>
+            <div class="recipe-card-body">
+                <h3>Roti Pizza</h3>
+                <div class="rc-meta">
+                    <div class="rc-meta-item"><i class="fa-regular fa-clock"></i> 10 min</div>
+                    <div class="rc-meta-item"><i class="fa-solid fa-gauge-simple-high"></i> Easy</div>
+                    <div class="rc-meta-item"><i class="fa-solid fa-fire"></i> 240 cal</div>
+                </div>
+                <p class="ingredients-used">✓ Uses: Roti, Paneer</p>
+                <div class="recipe-card-footer">
+                    <button class="btn-sm btn-sm-green" onclick="openRecipeModal('roti-pizza')">Cook Now</button>
+                    <button class="btn-sm btn-sm-outline"><i class="fa-regular fa-bookmark"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <div class="recipe-card" data-name="Dal Paratha" data-diff="medium" data-time="25" data-type="roti">
+            <div class="recipe-card-img">
+                <img src="https://rakskitchen.net/wp-content/uploads/2020/03/leftover-dal-paratha-500x375.jpg" alt="Dal Paratha" loading="lazy">
+                <span class="rc-badge">🫘 Uses Dal</span>
+                <button class="rc-save" onclick="toggleSave(this)"><i class="fa-regular fa-heart"></i></button>
+            </div>
+            <div class="recipe-card-body">
+                <h3>Dal Paratha</h3>
+                <div class="rc-meta">
+                    <div class="rc-meta-item"><i class="fa-regular fa-clock"></i> 25 min</div>
+                    <div class="rc-meta-item"><i class="fa-solid fa-gauge-simple-high"></i> Medium</div>
+                    <div class="rc-meta-item"><i class="fa-solid fa-fire"></i> 340 cal</div>
+                </div>
+                <p class="ingredients-used">✓ Uses: Dal, Flour</p>
+                <div class="recipe-card-footer">
+                    <button class="btn-sm btn-sm-green" onclick="openRecipeModal('dal-paratha')">Cook Now</button>
+                    <button class="btn-sm btn-sm-outline"><i class="fa-regular fa-bookmark"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <div class="recipe-card" data-name="Paneer Bhurji" data-diff="easy" data-time="12" data-type="rice">
+            <div class="recipe-card-img">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSiX63KWCiO2dXI5TxnpSo8gPlpnwQY0zvsJw&s" alt="Paneer Bhurji" loading="lazy">
+                <span class="rc-badge">🧀 Uses Paneer</span>
+                <button class="rc-save" onclick="toggleSave(this)"><i class="fa-regular fa-heart"></i></button>
+            </div>
+            <div class="recipe-card-body">
+                <h3>Paneer Bhurji</h3>
+                <div class="rc-meta">
+                    <div class="rc-meta-item"><i class="fa-regular fa-clock"></i> 12 min</div>
+                    <div class="rc-meta-item"><i class="fa-solid fa-gauge-simple-high"></i> Easy</div>
+                    <div class="rc-meta-item"><i class="fa-solid fa-fire"></i> 290 cal</div>
+                </div>
+                <p class="ingredients-used">✓ Uses: Paneer Curry</p>
+                <div class="recipe-card-footer">
+                    <button class="btn-sm btn-sm-green" onclick="openRecipeModal('paneer-bhurji')">Cook Now</button>
+                    <button class="btn-sm btn-sm-outline"><i class="fa-regular fa-bookmark"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- RECIPE DETAIL MODAL -->
+<div class="modal-overlay" id="recipeModal">
+    <div class="modal recipe-modal-content" style="max-width:600px;">
+        <div class="modal-header">
+            <h3 id="rm-title">Recipe</h3>
+            <button class="modal-close" onclick="closeModal('recipeModal')"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <img id="rm-img" src="" alt="" class="recipe-detail-img">
+        <div class="recipe-detail-meta">
+            <div class="rdm-item"><strong id="rm-time">15</strong><span>Minutes</span></div>
+            <div class="rdm-item"><strong id="rm-diff">Easy</strong><span>Difficulty</span></div>
+            <div class="rdm-item"><strong id="rm-servings">2</strong><span>Servings</span></div>
+            <div class="rdm-item"><strong id="rm-cal">320</strong><span>Calories</span></div>
+        </div>
+        <h4 style="margin-bottom:10px;font-size:15px;">Ingredients</h4>
+        <div class="ingredient-tags" id="rm-ingredients"></div>
+        <h4 style="margin-bottom:12px;font-size:15px;">Steps</h4>
+        <div class="steps-list" id="rm-steps"></div>
+        <button class="btn-primary" style="width:100%;justify-content:center;margin-top:20px;" onclick="markCooked()">
+            ✅ Mark as Cooked
+        </button>
+    </div>
+</div>
+
+<footer class="footer">
+    <div class="footer-bottom"><p>© 2026 RePlate – Smart Food Saver | Designed by Team 10</p></div>
+</footer>
+
+<script src="global.js"></script>
+<script>
+const recipes = {
+    'fried-rice': {
+        title: 'Vegetable Fried Rice',
+        img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRCmYaBQX9pZlzzuPDDTOd8Zxgo0XIPxgyzyQ&s',
+        time: 15, diff: 'Easy', servings: 2, cal: 320,
+        ingredients: ['2 cups Leftover Rice', '1 Onion', '2 tbsp Oil', 'Soy Sauce', 'Spring Onion', 'Mixed Vegetables', 'Salt & Pepper'],
+        steps: ['Heat oil in a wok on high flame.', 'Add chopped onions and sauté for 2 minutes.', 'Add mixed vegetables and stir fry for 3 minutes.', 'Add the leftover rice and break any clumps.', 'Pour soy sauce and stir well on high heat.', 'Season with salt and pepper. Garnish with spring onion.']
+    },
+    'rice-cutlets': {
+        title: 'Rice Cutlets',
+        img: 'https://www.indianveggiedelight.com/wp-content/uploads/2017/06/final_1_rice_cutlet-min.jpg',
+        time: 20, diff: 'Medium', servings: 4, cal: 180,
+        ingredients: ['1.5 cups Leftover Rice', '2 Boiled Potatoes', '1 Onion', 'Green Chilli', 'Coriander', 'Bread Crumbs', 'Oil for frying'],
+        steps: ['Mash potatoes and mix with rice in a bowl.', 'Add finely chopped onion, chilli, and coriander.', 'Shape into flat circular cutlets.', 'Coat each cutlet in bread crumbs.', 'Shallow fry on medium heat for 3 min per side until golden brown.', 'Serve hot with green chutney.']
+    },
+    'lemon-rice': {
+        title: 'Lemon Rice',
+        img: 'https://static.toiimg.com/thumb/53870704.cms?width=1200&height=900',
+        time: 10, diff: 'Easy', servings: 2, cal: 280,
+        ingredients: ['2 cups Leftover Rice', '2 tbsp Oil', '1 Lemon', 'Mustard Seeds', 'Curry Leaves', 'Turmeric', 'Cashews', 'Salt'],
+        steps: ['Heat oil, add mustard seeds and let them splutter.', 'Add curry leaves, cashews, and turmeric.', 'Add leftover rice and mix well.', 'Squeeze lemon juice over rice and stir.', 'Season with salt. Serve warm.']
+    },
+    'roti-pizza': {
+        title: 'Roti Pizza',
+        img: 'https://www.pillsbury.in/wp-content/uploads/2021/09/Roti-Pizza.jpg',
+        time: 10, diff: 'Easy', servings: 2, cal: 240,
+        ingredients: ['4 Leftover Rotis', 'Pizza Sauce', 'Paneer (crumbled)', 'Bell Pepper', 'Onion', 'Cheese', 'Oregano'],
+        steps: ['Spread pizza sauce on each roti.', 'Add toppings: paneer, vegetables.', 'Sprinkle cheese generously.', 'Bake in oven or air fryer at 180°C for 5 minutes.', 'Sprinkle oregano and serve hot.']
+    },
+    'dal-paratha': {
+        title: 'Dal Paratha',
+        img: 'https://rakskitchen.net/wp-content/uploads/2020/03/leftover-dal-paratha-500x375.jpg',
+        time: 25, diff: 'Medium', servings: 4, cal: 340,
+        ingredients: ['1 cup Leftover Dal', '2 cups Wheat Flour', 'Salt', 'Oil/Ghee', 'Cumin', 'Green Chilli', 'Coriander'],
+        steps: ['Thicken leftover dal by cooking for 5 minutes.', 'Mix flour, salt, and water to make a soft dough.', 'Divide dough into balls, flatten and add dal filling.', 'Seal the edges and roll into parathas.', 'Cook on tawa with ghee until golden on both sides.', 'Serve with yogurt or pickle.']
+    },
+    'paneer-bhurji': {
+        title: 'Paneer Bhurji',
+        img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSiX63KWCiO2dXI5TxnpSo8gPlpnwQY0zvsJw&s',
+        time: 12, diff: 'Easy', servings: 2, cal: 290,
+        ingredients: ['1 bowl Leftover Paneer Curry', '1 Onion', '1 Tomato', 'Spices', 'Coriander', 'Oil'],
+        steps: ['Heat oil and sauté onion until translucent.', 'Add tomato and cook until soft.', 'Add the paneer curry and break the paneer into crumbles.', 'Cook for 5 minutes, adjust spices.', 'Garnish with fresh coriander. Serve with roti.']
+    }
+};
+
+function openRecipeModal(id) {
+    const r = recipes[id];
+    if (!r) return;
+    document.getElementById('rm-title').textContent = r.title;
+    document.getElementById('rm-img').src = r.img;
+    document.getElementById('rm-time').textContent = r.time;
+    document.getElementById('rm-diff').textContent = r.diff;
+    document.getElementById('rm-servings').textContent = r.servings;
+    document.getElementById('rm-cal').textContent = r.cal;
+    const ingContainer = document.getElementById('rm-ingredients');
+    ingContainer.innerHTML = r.ingredients.map(i => `<span class="ingredient-tag">${i}</span>`).join('');
+    const stepsContainer = document.getElementById('rm-steps');
+    stepsContainer.innerHTML = r.steps.map((s, i) => `<div class="step-item"><div class="step-num">${i+1}</div><p>${s}</p></div>`).join('');
+    openModal('recipeModal');
+}
+
+function markCooked() {
+    closeModal('recipeModal');
+    showToast('🍳 Marked as cooked! Points added to your challenge.', 'success');
+}
+
+function toggleSave(btn) {
+    btn.classList.toggle('saved');
+    const icon = btn.querySelector('i');
+    icon.className = btn.classList.contains('saved') ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
+    showToast(btn.classList.contains('saved') ? '❤️ Recipe saved!' : 'Recipe removed from saved', 'info');
+}
+
+let currentFilter = 'all';
+function setFilter(btn, filter) {
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = filter;
+    filterRecipes();
+}
+
+function filterRecipes() {
+    const query = document.getElementById('recipeSearch').value.toLowerCase();
+    const cards = document.querySelectorAll('.recipe-card');
+    let visible = 0;
+    cards.forEach(card => {
+        const name = card.dataset.name.toLowerCase();
+        const diff = card.dataset.diff;
+        const time = parseInt(card.dataset.time);
+        const type = card.dataset.type;
+        let show = name.includes(query);
+        if (currentFilter === 'easy' && diff !== 'easy') show = false;
+        if (currentFilter === 'medium' && diff !== 'medium') show = false;
+        if (currentFilter === 'rice' && type !== 'rice') show = false;
+        if (currentFilter === 'roti' && type !== 'roti') show = false;
+        if (currentFilter === 'quick' && time > 15) show = false;
+        card.style.display = show ? '' : 'none';
+        if (show) visible++;
+    });
+    document.getElementById('recipeCount').textContent = `${visible} recipes found`;
+}
+</script>
+</body>
+</html>

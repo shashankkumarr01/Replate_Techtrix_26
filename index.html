@@ -2,183 +2,573 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>RePlate - Smart Food Saver</title>
+    <title>RePlate – Smart Food Saver</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
-
-    <!-- Font Awesome Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="global.css">
+    <style>
+        /* HERO */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            background: var(--bg);
+        }
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+        }
+        .hero-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.18;
+        }
+        .blob1 { width: 600px; height: 600px; background: var(--green); top: -100px; right: -100px; }
+        .blob2 { width: 400px; height: 400px; background: var(--amber); bottom: -50px; left: -50px; }
+        .blob3 { width: 300px; height: 300px; background: var(--green-light); top: 40%; left: 30%; }
 
-    <!-- CSS -->
-    <link rel="stylesheet" href="style.css">
+        .hero-inner {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 120px 8% 80px;
+            width: 100%;
+        }
+        .hero-text .tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(46,125,50,0.12);
+            color: var(--green);
+            border: 1px solid rgba(46,125,50,0.3);
+            padding: 6px 14px;
+            border-radius: 100px;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 24px;
+            animation: fadeUp 0.6s ease both;
+        }
+        .hero-text h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(38px, 5vw, 68px);
+            font-weight: 800;
+            line-height: 1.1;
+            color: var(--text);
+            margin-bottom: 20px;
+            animation: fadeUp 0.6s 0.1s ease both;
+        }
+        .hero-text h1 span { color: var(--green); }
+        .hero-text p {
+            font-size: 18px;
+            color: var(--muted);
+            line-height: 1.7;
+            margin-bottom: 36px;
+            animation: fadeUp 0.6s 0.2s ease both;
+        }
+        .hero-btns {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            animation: fadeUp 0.6s 0.3s ease both;
+        }
+        .hero-stats {
+            display: flex;
+            gap: 30px;
+            margin-top: 50px;
+            animation: fadeUp 0.6s 0.4s ease both;
+        }
+        .hero-stat strong { display: block; font-size: 28px; font-weight: 800; color: var(--green); font-family: 'Syne', sans-serif; }
+        .hero-stat span { font-size: 13px; color: var(--muted); }
+
+        /* HERO VISUAL */
+        .hero-visual {
+            animation: fadeIn 0.8s 0.3s ease both;
+            position: relative;
+        }
+        .phone-mockup {
+            width: 100%;
+            max-width: 360px;
+            margin: 0 auto;
+            display: block;
+            background: white;
+            border-radius: 36px;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.12), 0 0 0 8px rgba(46,125,50,0.08);
+            overflow: hidden;
+            position: relative;
+        }
+        .phone-screen {
+            background: linear-gradient(160deg, #f0faf0 0%, #fffef0 100%);
+            padding: 28px 20px;
+            min-height: 480px;
+        }
+        .phone-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .phone-header h4 { font-size: 15px; font-weight: 700; }
+        .phone-header span { background: var(--green); color: white; font-size: 11px; padding: 4px 10px; border-radius: 20px; }
+        .phone-cards { display: flex; flex-direction: column; gap: 12px; }
+        .phone-food-item {
+            background: white;
+            border-radius: 14px;
+            padding: 12px 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            animation: slideRight 0.5s ease both;
+        }
+        .phone-food-item:nth-child(2) { animation-delay: 0.1s; }
+        .phone-food-item:nth-child(3) { animation-delay: 0.2s; }
+        .pfi-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+        .pfi-icon.rice { background: #FFF3E0; }
+        .pfi-icon.curry { background: #F3E5F5; }
+        .pfi-icon.dal { background: #E8F5E9; }
+        .pfi-details { flex: 1; }
+        .pfi-details h5 { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
+        .pfi-details p { font-size: 11px; color: var(--muted); }
+        .pfi-badge { font-size: 10px; padding: 3px 8px; border-radius: 20px; white-space: nowrap; }
+        .pfi-badge.urgent { background: #FFEBEE; color: #C62828; }
+        .pfi-badge.safe { background: #E8F5E9; color: #2E7D32; }
+        .phone-footer { margin-top: 16px; background: var(--green); border-radius: 12px; padding: 12px; color: white; text-align: center; font-size: 13px; font-weight: 600; }
+
+        .floating-badge {
+            position: absolute;
+            background: white;
+            border-radius: 16px;
+            padding: 12px 18px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            animation: float 3s ease-in-out infinite;
+        }
+        .floating-badge.top { top: -20px; right: -30px; animation-delay: 0s; }
+        .floating-badge.bottom { bottom: 20px; left: -40px; animation-delay: 1.5s; }
+        .floating-badge i { font-size: 20px; }
+        .fb-green { color: var(--green); }
+        .fb-amber { color: var(--amber); }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* FEATURES */
+        .features { padding: 100px 8%; background: white; }
+        .section-head { text-align: center; max-width: 600px; margin: 0 auto 60px; }
+        .section-head .pre-label {
+            font-size: 12px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase;
+            color: var(--green); margin-bottom: 12px; display: block;
+        }
+        .section-head h2 { font-size: clamp(28px, 4vw, 44px); font-weight: 800; margin-bottom: 16px; }
+        .section-head p { color: var(--muted); font-size: 16px; line-height: 1.7; }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 24px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .feature-card {
+            background: var(--bg);
+            border-radius: 20px;
+            padding: 32px;
+            border: 1.5px solid var(--border);
+            transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(46,125,50,0.05), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .feature-card:hover { transform: translateY(-6px); border-color: var(--green); box-shadow: 0 20px 50px rgba(46,125,50,0.12); }
+        .feature-card:hover::before { opacity: 1; }
+        .fc-icon {
+            width: 56px; height: 56px; border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px; margin-bottom: 20px;
+        }
+        .fc-icon.g { background: rgba(46,125,50,0.1); color: var(--green); }
+        .fc-icon.a { background: rgba(245,124,0,0.1); color: var(--amber); }
+        .fc-icon.b { background: rgba(25,118,210,0.1); color: #1976D2; }
+        .fc-icon.p { background: rgba(156,39,176,0.1); color: #9C27B0; }
+        .feature-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 10px; }
+        .feature-card p { color: var(--muted); font-size: 14px; line-height: 1.6; margin-bottom: 20px; }
+        .fc-link { color: var(--green); font-weight: 600; font-size: 14px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: gap 0.2s; }
+        .fc-link:hover { gap: 10px; }
+
+        /* HOW IT WORKS */
+        .how { padding: 100px 8%; }
+        .how-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 0;
+            max-width: 1100px;
+            margin: 0 auto;
+            position: relative;
+        }
+        .how-grid::before {
+            content: '';
+            position: absolute;
+            top: 32px;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--green), var(--amber));
+        }
+        .how-step { text-align: center; padding: 0 20px; position: relative; }
+        .how-num {
+            width: 64px; height: 64px; border-radius: 50%;
+            background: white; border: 3px solid var(--green);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px; font-weight: 800; color: var(--green);
+            margin: 0 auto 24px;
+            position: relative; z-index: 1;
+            font-family: 'Syne', sans-serif;
+            transition: all 0.3s;
+        }
+        .how-step:hover .how-num { background: var(--green); color: white; transform: scale(1.1); }
+        .how-step h3 { font-size: 17px; font-weight: 700; margin-bottom: 10px; }
+        .how-step p { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+        /* CTA */
+        .cta-section {
+            padding: 80px 8%;
+            background: linear-gradient(135deg, #1B5E20 0%, #2E7D32 50%, #388E3C 100%);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        .cta-section h2 { font-size: clamp(28px, 4vw, 48px); font-weight: 800; color: white; margin-bottom: 16px; position: relative; }
+        .cta-section p { color: rgba(255,255,255,0.8); font-size: 18px; margin-bottom: 36px; position: relative; }
+        .cta-btns { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; position: relative; }
+        .btn-white { background: white; color: var(--green); padding: 14px 28px; border: none; border-radius: 12px; font-weight: 700; font-size: 15px; cursor: pointer; transition: all 0.3s; font-family: 'DM Sans', sans-serif; }
+        .btn-white:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(0,0,0,0.2); }
+        .btn-outline-white { background: transparent; color: white; padding: 14px 28px; border: 2px solid rgba(255,255,255,0.5); border-radius: 12px; font-weight: 700; font-size: 15px; cursor: pointer; transition: all 0.3s; font-family: 'DM Sans', sans-serif; }
+        .btn-outline-white:hover { background: rgba(255,255,255,0.1); border-color: white; }
+
+        /* TESTIMONIALS */
+        .testimonials { padding: 100px 8%; background: white; }
+        .testi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; max-width: 1200px; margin: 0 auto; }
+        .testi-card {
+            background: var(--bg); border-radius: 20px; padding: 28px;
+            border: 1.5px solid var(--border);
+            transition: all 0.3s;
+        }
+        .testi-card:hover { transform: translateY(-4px); border-color: var(--green); }
+        .testi-stars { color: var(--amber); font-size: 14px; margin-bottom: 14px; }
+        .testi-text { font-size: 15px; line-height: 1.7; color: #444; margin-bottom: 20px; font-style: italic; }
+        .testi-author { display: flex; align-items: center; gap: 12px; }
+        .testi-avatar { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; color: white; flex-shrink: 0; }
+        .av1 { background: #2E7D32; }
+        .av2 { background: #F57C00; }
+        .av3 { background: #7B1FA2; }
+        .testi-author-info strong { display: block; font-size: 14px; font-weight: 700; }
+        .testi-author-info span { font-size: 12px; color: var(--muted); }
+
+        /* SCROLL REVEAL */
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.7s cubic-bezier(0.4,0,0.2,1); }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+
+        @media (max-width: 900px) {
+            .hero-inner { grid-template-columns: 1fr; gap: 40px; padding-top: 100px; }
+            .hero-visual { order: -1; }
+            .phone-mockup { max-width: 280px; }
+            .floating-badge { display: none; }
+            .hero-stats { gap: 20px; }
+            .how-grid::before { display: none; }
+        }
+        @media (max-width: 600px) {
+            .hero-stats { flex-wrap: wrap; gap: 16px; }
+            .how-grid { grid-template-columns: 1fr 1fr; gap: 30px; }
+        }
+    </style>
 </head>
 <body>
 
-<!-- ================= NAVIGATION ================= -->
-<header class="navbar">
-    <div class="logo">RePlate</div>
-    <nav>
-        <ul>
-            <li><a href="#dashboard">Dashboard</a></li>
-            <li><a href="#recipes">Recipes</a></li>
-            <li><a href="#analytics">Analytics</a></li>
-            <li><a href="#challenge">Challenge</a></li>
+<!-- NAVBAR -->
+<nav class="navbar" id="navbar">
+    <div class="nav-inner">
+        <a href="index.html" class="logo">Re<span>Plate</span></a>
+        <ul class="nav-links">
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="recipes.html">Recipes</a></li>
+            <li><a href="analytics.html">Analytics</a></li>
+            <li><a href="challenge.html">Challenge</a></li>
+            <li><a href="inventory.html">Inventory</a></li>
         </ul>
-    </nav>
-    <button class="cta-btn">Start Saving Food</button>
-</header>
+        <div class="nav-actions">
+            <a href="dashboard.html" class="btn-primary">Open App</a>
+            <button class="hamburger" id="hamburger" aria-label="Menu">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </div>
+</nav>
 
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+    <ul>
+        <li><a href="dashboard.html">Dashboard</a></li>
+        <li><a href="recipes.html">Recipes</a></li>
+        <li><a href="analytics.html">Analytics</a></li>
+        <li><a href="challenge.html">Challenge</a></li>
+        <li><a href="inventory.html">Inventory</a></li>
+    </ul>
+    <a href="dashboard.html" class="btn-primary" style="display:block;text-align:center;margin-top:20px;">Open App</a>
+</div>
 
-<!-- ================= HERO SECTION ================= -->
+<!-- HERO -->
 <section class="hero">
-    <div class="hero-content">
-        <h1>Turn Leftovers Into Delicious Possibilities.</h1>
-        <p>Track your food, reduce waste, and save money with AI-powered smart suggestions for your family.</p>
-        <button class="primary-btn">Explore Dashboard</button>
+    <div class="hero-bg">
+        <div class="hero-blob blob1"></div>
+        <div class="hero-blob blob2"></div>
+        <div class="hero-blob blob3"></div>
     </div>
-</section>
-
-
-<!-- ================= DASHBOARD ================= -->
-<section id="dashboard" class="dashboard">
-    <h2>Good Evening, Kumar Family 👋</h2>
-
-    <div class="stats-grid">
-        <div class="card">
-            <i class="fa-solid fa-bowl-food"></i>
-            <h3>4</h3>
-            <p>Leftovers</p>
-        </div>
-
-        <div class="card warning">
-            <i class="fa-solid fa-clock"></i>
-            <h3>2</h3>
-            <p>Expiring Soon</p>
-        </div>
-
-        <div class="card success">
-            <i class="fa-solid fa-indian-rupee-sign"></i>
-            <h3>₹420</h3>
-            <p>Saved This Month</p>
-        </div>
-
-        <div class="card eco">
-            <i class="fa-solid fa-leaf"></i>
-            <h3>2.1kg</h3>
-            <p>CO₂ Reduced</p>
-        </div>
-    </div>
-
-    <h3 class="section-title">Today's Leftovers</h3>
-
-    <div class="leftover-grid">
-
-        <div class="food-card">
-            <img src="https://static01.nyt.com/images/2018/02/21/dining/00RICEGUIDE8/00RICEGUIDE8-threeByTwoLargeAt2X.jpg" alt="Rice">
-            <div class="food-info">
-                <h4>Rice</h4>
-                <p>2 Servings</p>
-                <span class="badge urgent">Use within 24 hrs</span>
-                <button class="secondary-btn">View Recipes</button>
+    <div class="hero-inner">
+        <div class="hero-text">
+            <div class="tag"><i class="fa-solid fa-leaf"></i> AI-Powered Food Saver</div>
+            <h1>Turn <span>Leftovers</span> Into Delicious Possibilities</h1>
+            <p>Track your food, reduce waste, and save money with smart AI-powered suggestions tailored for your family's needs.</p>
+            <div class="hero-btns">
+                <a href="dashboard.html" class="btn-primary">Explore Dashboard <i class="fa-solid fa-arrow-right"></i></a>
+                <a href="recipes.html" class="btn-secondary">View Recipes</a>
+            </div>
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <strong>₹2,400+</strong>
+                    <span>Avg saved/month</span>
+                </div>
+                <div class="hero-stat">
+                    <strong>40%</strong>
+                    <span>Less food waste</span>
+                </div>
+                <div class="hero-stat">
+                    <strong>500+</strong>
+                    <span>Recipes available</span>
+                </div>
             </div>
         </div>
-
-        <div class="food-card">
-            <img src="https://www.indianhealthyrecipes.com/wp-content/uploads/2023/02/paneer-curry-recipe.jpg" alt="Paneer Curry">
-            <div class="food-info">
-                <h4>Paneer Curry</h4>
-                <p>1 Bowl</p>
-                <span class="badge safe">Fresh</span>
-                <button class="secondary-btn">View Recipes</button>
+        <div class="hero-visual">
+            <div class="floating-badge top">
+                <i class="fa-solid fa-fire fb-amber"></i>
+                <span>3-Day Streak! 🔥</span>
+            </div>
+            <div class="phone-mockup">
+                <div class="phone-screen">
+                    <div class="phone-header">
+                        <h4>Today's Kitchen</h4>
+                        <span>4 items</span>
+                    </div>
+                    <div class="phone-cards">
+                        <div class="phone-food-item">
+                            <div class="pfi-icon rice">🍚</div>
+                            <div class="pfi-details">
+                                <h5>Cooked Rice</h5>
+                                <p>2 servings left</p>
+                            </div>
+                            <span class="pfi-badge urgent">24h</span>
+                        </div>
+                        <div class="phone-food-item">
+                            <div class="pfi-icon curry">🍛</div>
+                            <div class="pfi-details">
+                                <h5>Paneer Curry</h5>
+                                <p>1 bowl</p>
+                            </div>
+                            <span class="pfi-badge safe">Fresh</span>
+                        </div>
+                        <div class="phone-food-item">
+                            <div class="pfi-icon dal">🫘</div>
+                            <div class="pfi-details">
+                                <h5>Dal Tadka</h5>
+                                <p>3 servings</p>
+                            </div>
+                            <span class="pfi-badge safe">2 days</span>
+                        </div>
+                    </div>
+                    <div class="phone-footer">✨ 3 AI Recipes Ready</div>
+                </div>
+            </div>
+            <div class="floating-badge bottom">
+                <i class="fa-solid fa-indian-rupee-sign fb-green"></i>
+                <span>₹420 saved this month</span>
             </div>
         </div>
-
-    </div>
-
-    <button class="floating-btn">
-        <i class="fa-solid fa-plus"></i>
-    </button>
-</section>
-
-
-<!-- ================= RECIPES SECTION ================= -->
-<section id="recipes" class="recipes">
-    <h2>AI Recipe Suggestions</h2>
-
-    <div class="recipe-grid">
-
-        <div class="recipe-card">
-            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRCmYaBQX9pZlzzuPDDTOd8Zxgo0XIPxgyzyQ&s" alt="Fried Rice">
-            <h4>Vegetable Fried Rice</h4>
-            <p>15 mins • Easy</p>
-            <button class="primary-btn">Cook Now</button>
-        </div>
-
-        <div class="recipe-card">
-            <img src="https://www.indianveggiedelight.com/wp-content/uploads/2017/06/final_1_rice_cutlet-min.jpg" alt="Rice Cutlet">
-            <h4>Rice Cutlets</h4>
-            <p>20 mins • Medium</p>
-            <button class="primary-btn">Cook Now</button>
-        </div>
-
-        <div class="recipe-card">
-            <img src="https://static.toiimg.com/thumb/53870704.cms?width=1200&height=900" alt="Lemon Rice">
-            <h4>Lemon Rice</h4>
-            <p>10 mins • Easy</p>
-            <button class="primary-btn">Cook Now</button>
-        </div>
-
     </div>
 </section>
 
-
-<!-- ================= ANALYTICS SECTION ================= -->
-<section id="analytics" class="analytics">
-    <h2>Waste Analytics</h2>
-
-    <div class="analytics-grid">
-        <div class="analytics-card">
-            <h4>Most Wasted Item</h4>
-            <p>Rice (40%)</p>
+<!-- FEATURES -->
+<section class="features reveal">
+    <div class="section-head">
+        <span class="pre-label">Everything You Need</span>
+        <h2>Smart Features for a Waste-Free Kitchen</h2>
+        <p>RePlate combines AI technology with simple tracking tools to help your family eat smarter and waste less.</p>
+    </div>
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="fc-icon g"><i class="fa-solid fa-bowl-food"></i></div>
+            <h3>Smart Inventory</h3>
+            <p>Easily track all your leftovers and pantry items. Get real-time expiry alerts before food goes to waste.</p>
+            <a href="inventory.html" class="fc-link">Track Now <i class="fa-solid fa-arrow-right"></i></a>
         </div>
-
-        <div class="analytics-card">
-            <h4>Weekly Improvement</h4>
-            <p>18% Reduction</p>
+        <div class="feature-card">
+            <div class="fc-icon a"><i class="fa-solid fa-hat-chef"></i></div>
+            <h3>AI Recipe Engine</h3>
+            <p>Our AI scans your leftovers and suggests creative, delicious recipes you can make right now.</p>
+            <a href="recipes.html" class="fc-link">Get Recipes <i class="fa-solid fa-arrow-right"></i></a>
         </div>
-
-        <div class="analytics-card insight">
-            <h4>Smart Insight</h4>
-            <p>You waste more rice on weekends. Consider cooking smaller portions.</p>
+        <div class="feature-card">
+            <div class="fc-icon b"><i class="fa-solid fa-chart-line"></i></div>
+            <h3>Waste Analytics</h3>
+            <p>Visualize your food waste patterns with detailed charts and actionable weekly insights.</p>
+            <a href="analytics.html" class="fc-link">View Analytics <i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+        <div class="feature-card">
+            <div class="fc-icon p"><i class="fa-solid fa-trophy"></i></div>
+            <h3>Family Challenges</h3>
+            <p>Gamify your waste reduction journey with family challenges, badges, and leaderboards.</p>
+            <a href="challenge.html" class="fc-link">Join Challenge <i class="fa-solid fa-arrow-right"></i></a>
         </div>
     </div>
 </section>
 
-
-<!-- ================= ZERO WASTE CHALLENGE ================= -->
-<section id="challenge" class="challenge">
-    <h2>Zero Waste Family Challenge 🏆</h2>
-
-    <div class="challenge-box">
-        <p>3 Days Without Waste</p>
-        <div class="progress-bar">
-            <div class="progress"></div>
+<!-- HOW IT WORKS -->
+<section class="how reveal">
+    <div class="section-head">
+        <span class="pre-label">How It Works</span>
+        <h2>Three Simple Steps</h2>
+        <p>Getting started with RePlate takes less than 2 minutes.</p>
+    </div>
+    <div class="how-grid">
+        <div class="how-step">
+            <div class="how-num">1</div>
+            <h3>Log Your Food</h3>
+            <p>Quickly add leftovers and pantry items with a single tap. No complicated setup needed.</p>
         </div>
-        <span class="badge success">Bronze Badge Earned</span>
+        <div class="how-step">
+            <div class="how-num">2</div>
+            <h3>Get AI Suggestions</h3>
+            <p>Our AI instantly suggests recipes based on exactly what you have available.</p>
+        </div>
+        <div class="how-step">
+            <div class="how-num">3</div>
+            <h3>Cook & Save</h3>
+            <p>Follow step-by-step recipes, reduce waste, and track your savings over time.</p>
+        </div>
+        <div class="how-step">
+            <div class="how-num">4</div>
+            <h3>Earn Badges</h3>
+            <p>Complete challenges, earn badges, and compete with your family for the top spot.</p>
+        </div>
     </div>
 </section>
 
+<!-- TESTIMONIALS -->
+<section class="testimonials reveal">
+    <div class="section-head">
+        <span class="pre-label">Real Families</span>
+        <h2>What Our Users Say</h2>
+        <p>Join thousands of Indian families already saving food and money every day.</p>
+    </div>
+    <div class="testi-grid">
+        <div class="testi-card">
+            <div class="testi-stars">★★★★★</div>
+            <p class="testi-text">"RePlate helped us save ₹800 in just the first week! The AI recipes are amazing — my kids now look forward to leftover nights."</p>
+            <div class="testi-author">
+                <div class="testi-avatar av1">P</div>
+                <div class="testi-author-info">
+                    <strong>Priya Sharma</strong>
+                    <span>Mother of 2, Bengaluru</span>
+                </div>
+            </div>
+        </div>
+        <div class="testi-card">
+            <div class="testi-stars">★★★★★</div>
+            <p class="testi-text">"The waste analytics opened my eyes. I never realized how much rice we were throwing away every weekend. Now we cook just the right amount."</p>
+            <div class="testi-author">
+                <div class="testi-avatar av2">R</div>
+                <div class="testi-author-info">
+                    <strong>Rajesh Kumar</strong>
+                    <span>Chef & Father, Chennai</span>
+                </div>
+            </div>
+        </div>
+        <div class="testi-card">
+            <div class="testi-stars">★★★★★</div>
+            <p class="testi-text">"The challenge feature made reducing food waste fun for the whole family. My daughter earned her first Gold Badge last week!"</p>
+            <div class="testi-author">
+                <div class="testi-avatar av3">A</div>
+                <div class="testi-author-info">
+                    <strong>Ananya Verma</strong>
+                    <span>Home Cook, Mumbai</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
-<!-- ================= FOOTER ================= -->
+<!-- CTA -->
+<section class="cta-section reveal">
+    <h2>Start Saving Food Today 🌿</h2>
+    <p>Join 10,000+ families already making a difference with RePlate.</p>
+    <div class="cta-btns">
+        <button class="btn-white" onclick="window.location='dashboard.html'">Open Dashboard</button>
+        <button class="btn-outline-white" onclick="window.location='inventory.html'">Add Your First Item</button>
+    </div>
+</section>
+
+<!-- FOOTER -->
 <footer class="footer">
-    <p>© 2026 RePlate – Smart Food Saver | Designed by Team 10</p>
+    <div class="footer-inner">
+        <div class="footer-brand">
+            <div class="logo">Re<span>Plate</span></div>
+            <p>Smart food waste reduction for Indian families.</p>
+        </div>
+        <div class="footer-links">
+            <div class="footer-col">
+                <h5>App</h5>
+                <ul>
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                    <li><a href="inventory.html">Inventory</a></li>
+                    <li><a href="recipes.html">Recipes</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h5>Insights</h5>
+                <ul>
+                    <li><a href="analytics.html">Analytics</a></li>
+                    <li><a href="challenge.html">Challenges</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>© 2026 RePlate – Smart Food Saver | Designed by Team 10</p>
+    </div>
 </footer>
 
-
-<!-- JS -->
-<script src="script.js"></script>
-
+<script src="global.js"></script>
 </body>
 </html>

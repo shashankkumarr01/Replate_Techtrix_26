@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Analytics – RePlate</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="global.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <style>
+        .analytics-wrap { max-width: 1280px; margin: 0 auto; padding: 90px 5% 60px; }
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        .metric-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 22px;
+            border: 1.5px solid var(--border);
+            text-align: center;
+            transition: var(--transition);
+        }
+        .metric-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+        .metric-card .m-icon { font-size: 28px; margin-bottom: 10px; }
+        .metric-card h3 { font-size: 28px; font-weight: 800; color: var(--green); margin-bottom: 4px; }
+        .metric-card p { font-size: 13px; color: var(--muted); }
+        .metric-card .m-trend { font-size: 12px; margin-top: 6px; color: var(--green); font-weight: 600; }
+        
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .chart-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 24px;
+            border: 1.5px solid var(--border);
+        }
+        .chart-card h3 { font-size: 17px; margin-bottom: 20px; }
+        .chart-card canvas { max-height: 260px; }
+        
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .insight-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 22px;
+            border: 1.5px solid var(--border);
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+            transition: var(--transition);
+        }
+        .insight-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+        .insight-icon { width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+        .ii-g { background: #E8F5E9; color: var(--green); }
+        .ii-a { background: #FFF3E0; color: var(--amber); }
+        .ii-b { background: #E3F2FD; color: #1565C0; }
+        .ii-r { background: #FFEBEE; color: var(--red); }
+        .insight-body h4 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+        .insight-body p { font-size: 14px; color: var(--muted); line-height: 1.5; }
+
+        .waste-breakdown {
+            background: white;
+            border-radius: var(--radius);
+            padding: 24px;
+            border: 1.5px solid var(--border);
+        }
+        .waste-items { display: flex; flex-direction: column; gap: 14px; margin-top: 16px; }
+        .waste-item { display: flex; align-items: center; gap: 14px; }
+        .waste-item-name { width: 120px; font-size: 14px; font-weight: 500; flex-shrink: 0; }
+        .waste-item-bar { flex: 1; }
+        .waste-item-pct { width: 40px; font-size: 14px; font-weight: 700; text-align: right; color: var(--green); }
+
+        .period-tabs { display: flex; gap: 8px; margin-bottom: 24px; }
+        .period-btn { padding: 8px 16px; border-radius: 10px; border: 2px solid var(--border); background: white; font-family: 'DM Sans'; font-size: 14px; font-weight: 500; cursor: pointer; transition: var(--transition); }
+        .period-btn.active, .period-btn:hover { background: var(--green); color: white; border-color: var(--green); }
+
+        @media (max-width: 900px) { .charts-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 600px) { .stats-row { grid-template-columns: 1fr 1fr; } }
+    </style>
+</head>
+<body>
+<nav class="navbar" id="navbar">
+    <div class="nav-inner">
+        <a href="index.html" class="logo">Re<span>Plate</span></a>
+        <ul class="nav-links">
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="recipes.html">Recipes</a></li>
+            <li><a href="analytics.html">Analytics</a></li>
+            <li><a href="challenge.html">Challenge</a></li>
+            <li><a href="inventory.html">Inventory</a></li>
+        </ul>
+        <div class="nav-actions">
+            <a href="dashboard.html" class="btn-primary">Dashboard</a>
+            <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+        </div>
+    </div>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+    <ul>
+        <li><a href="dashboard.html">Dashboard</a></li>
+        <li><a href="recipes.html">Recipes</a></li>
+        <li><a href="analytics.html">Analytics</a></li>
+        <li><a href="challenge.html">Challenge</a></li>
+        <li><a href="inventory.html">Inventory</a></li>
+    </ul>
+</div>
+
+<div class="analytics-wrap">
+    <div style="margin-bottom:28px;" class="reveal">
+        <div style="font-size:13px;color:var(--muted);margin-bottom:10px;"><a href="index.html" style="color:var(--green);">Home</a> › Analytics</div>
+        <h1 style="font-size:clamp(26px,3vw,38px);margin-bottom:8px;">Waste Analytics 📊</h1>
+        <p style="color:var(--muted);font-size:15px;">Track your progress and understand your food waste patterns.</p>
+    </div>
+
+    <!-- PERIOD SELECTOR -->
+    <div class="period-tabs reveal">
+        <button class="period-btn active" onclick="setPeriod(this,'week')">This Week</button>
+        <button class="period-btn" onclick="setPeriod(this,'month')">This Month</button>
+        <button class="period-btn" onclick="setPeriod(this,'3month')">3 Months</button>
+    </div>
+
+    <!-- METRICS -->
+    <div class="stats-row reveal">
+        <div class="metric-card">
+            <div class="m-icon">🗑️</div>
+            <h3 id="m1">0%</h3>
+            <p>Waste Reduced</p>
+            <div class="m-trend">↑ vs last period</div>
+        </div>
+        <div class="metric-card">
+            <div class="m-icon">💰</div>
+            <h3 id="m2">₹0</h3>
+            <p>Money Saved</p>
+            <div class="m-trend">↑ vs last period</div>
+        </div>
+        <div class="metric-card">
+            <div class="m-icon">🍽️</div>
+            <h3 id="m3">0</h3>
+            <p>Meals Cooked</p>
+            <div class="m-trend">From leftovers</div>
+        </div>
+        <div class="metric-card">
+            <div class="m-icon">🌿</div>
+            <h3 id="m4">0kg</h3>
+            <p>CO₂ Saved</p>
+            <div class="m-trend">Great work!</div>
+        </div>
+        <div class="metric-card">
+            <div class="m-icon">📦</div>
+            <h3 id="m5">0</h3>
+            <p>Items Tracked</p>
+            <div class="m-trend">Total logged</div>
+        </div>
+    </div>
+
+    <!-- CHARTS ROW 1 -->
+    <div class="charts-grid reveal">
+        <div class="chart-card">
+            <h3>Weekly Waste Reduction Trend</h3>
+            <canvas id="lineChart"></canvas>
+        </div>
+        <div class="chart-card">
+            <h3>Waste by Category</h3>
+            <canvas id="doughnutChart"></canvas>
+        </div>
+    </div>
+
+    <!-- CHARTS ROW 2 -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;" class="reveal">
+        <div class="chart-card">
+            <h3>Daily Meals from Leftovers</h3>
+            <canvas id="barChart"></canvas>
+        </div>
+        <div class="waste-breakdown">
+            <h3>Top Wasted Items</h3>
+            <div class="waste-items" id="wasteItems">
+                <div class="waste-item">
+                    <span class="waste-item-name">🍚 Rice</span>
+                    <div class="waste-item-bar"><div class="progress-bar"><div class="progress-fill" style="width:0%" data-width="78"></div></div></div>
+                    <span class="waste-item-pct">40%</span>
+                </div>
+                <div class="waste-item">
+                    <span class="waste-item-name">🫓 Roti</span>
+                    <div class="waste-item-bar"><div class="progress-bar"><div class="progress-fill" style="width:0%" data-width="52"></div></div></div>
+                    <span class="waste-item-pct">27%</span>
+                </div>
+                <div class="waste-item">
+                    <span class="waste-item-name">🍛 Sabzi</span>
+                    <div class="waste-item-bar"><div class="progress-bar"><div class="progress-fill amber" style="width:0%" data-width="36"></div></div></div>
+                    <span class="waste-item-pct">19%</span>
+                </div>
+                <div class="waste-item">
+                    <span class="waste-item-name">🫘 Dal</span>
+                    <div class="waste-item-bar"><div class="progress-bar"><div class="progress-fill amber" style="width:0%" data-width="14"></div></div></div>
+                    <span class="waste-item-pct">7%</span>
+                </div>
+                <div class="waste-item">
+                    <span class="waste-item-name">🥗 Other</span>
+                    <div class="waste-item-bar"><div class="progress-bar"><div class="progress-fill" style="width:0%;background:#9C27B0;" data-width="13"></div></div></div>
+                    <span class="waste-item-pct">7%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SMART INSIGHTS -->
+    <h2 style="font-size:20px;margin-bottom:16px;" class="reveal">🧠 Smart Insights</h2>
+    <div class="insights-grid reveal">
+        <div class="insight-card">
+            <div class="insight-icon ii-a"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <div class="insight-body">
+                <h4>Weekend Rice Waste</h4>
+                <p>You waste 60% more rice on Saturdays and Sundays. Try cooking smaller portions on weekends.</p>
+            </div>
+        </div>
+        <div class="insight-card">
+            <div class="insight-icon ii-g"><i class="fa-solid fa-arrow-trend-up"></i></div>
+            <div class="insight-body">
+                <h4>18% Less Waste This Week</h4>
+                <p>Great progress! You've reduced waste consistently for 3 days in a row.</p>
+            </div>
+        </div>
+        <div class="insight-card">
+            <div class="insight-icon ii-b"><i class="fa-solid fa-lightbulb"></i></div>
+            <div class="insight-body">
+                <h4>Best Reuse Day: Wednesday</h4>
+                <p>You cook with leftovers most on Wednesdays. Keep up this habit!</p>
+            </div>
+        </div>
+        <div class="insight-card">
+            <div class="insight-icon ii-r"><i class="fa-solid fa-clock"></i></div>
+            <div class="insight-body">
+                <h4>Act on Expiry Alerts</h4>
+                <p>2 items are expiring in the next 24 hours. Use AI recipes to cook them now.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="footer">
+    <div class="footer-bottom"><p>© 2026 RePlate – Smart Food Saver | Designed by Team 10</p></div>
+</footer>
+
+<script src="global.js"></script>
+<script>
+// Metrics animate
+const periodData = {
+    week: { waste:'18%', saved:'₹420', meals:12, co2:'2.1kg', tracked:24 },
+    month: { waste:'32%', saved:'₹1,840', meals:45, co2:'8.4kg', tracked:89 },
+    '3month': { waste:'41%', saved:'₹5,200', meals:142, co2:'24kg', tracked:267 }
+};
+
+function setPeriod(btn, period) {
+    document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const d = periodData[period];
+    document.getElementById('m1').textContent = d.waste;
+    document.getElementById('m2').textContent = d.saved;
+    document.getElementById('m3').textContent = d.meals;
+    document.getElementById('m4').textContent = d.co2;
+    document.getElementById('m5').textContent = d.tracked;
+}
+
+// Init metrics
+setTimeout(() => {
+    document.getElementById('m1').textContent = '18%';
+    document.getElementById('m2').textContent = '₹420';
+    document.getElementById('m3').textContent = '12';
+    document.getElementById('m4').textContent = '2.1kg';
+    document.getElementById('m5').textContent = '24';
+}, 600);
+
+// Charts
+const chartDefaults = {
+    font: { family: 'DM Sans', size: 12 },
+    color: '#6B7280'
+};
+Chart.defaults.font.family = 'DM Sans';
+Chart.defaults.color = '#6B7280';
+
+// Line Chart
+const lineCtx = document.getElementById('lineChart').getContext('2d');
+new Chart(lineCtx, {
+    type: 'line',
+    data: {
+        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        datasets: [{
+            label: 'Waste (kg)',
+            data: [0.8, 0.6, 0.4, 0.5, 0.3, 0.7, 0.4],
+            borderColor: '#F57C00',
+            backgroundColor: 'rgba(245,124,0,0.08)',
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: '#F57C00',
+            pointRadius: 5
+        }, {
+            label: 'Reused (kg)',
+            data: [0.4, 0.7, 0.9, 0.8, 1.0, 0.5, 0.8],
+            borderColor: '#2E7D32',
+            backgroundColor: 'rgba(46,125,50,0.08)',
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: '#2E7D32',
+            pointRadius: 5
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { position: 'bottom' } },
+        scales: {
+            y: { beginAtZero: true, grid: { color: '#F3F4F6' } },
+            x: { grid: { display: false } }
+        }
+    }
+});
+
+// Doughnut Chart
+const dCtx = document.getElementById('doughnutChart').getContext('2d');
+new Chart(dCtx, {
+    type: 'doughnut',
+    data: {
+        labels: ['Rice', 'Roti', 'Sabzi', 'Dal', 'Other'],
+        datasets: [{
+            data: [40, 27, 19, 7, 7],
+            backgroundColor: ['#2E7D32', '#F57C00', '#1976D2', '#7B1FA2', '#9E9E9E'],
+            borderWidth: 0,
+            hoverOffset: 8
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { position: 'bottom', labels: { padding: 16, usePointStyle: true } } },
+        cutout: '65%'
+    }
+});
+
+// Bar Chart
+const bCtx = document.getElementById('barChart').getContext('2d');
+new Chart(bCtx, {
+    type: 'bar',
+    data: {
+        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        datasets: [{
+            label: 'Leftover Meals',
+            data: [1, 2, 3, 2, 3, 1, 2],
+            backgroundColor: 'rgba(46,125,50,0.8)',
+            borderRadius: 8
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+            y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: '#F3F4F6' } },
+            x: { grid: { display: false } }
+        }
+    }
+});
+
+// Animate progress bars on scroll
+const progressObserver = new IntersectionObserver(entries => {
+    if (entries[0].isIntersecting) {
+        document.querySelectorAll('[data-width]').forEach(bar => {
+            setTimeout(() => {
+                bar.style.transition = 'width 1s cubic-bezier(0.4,0,0.2,1)';
+                bar.style.width = bar.dataset.width + '%';
+            }, 100);
+        });
+        progressObserver.disconnect();
+    }
+}, { threshold: 0.3 });
+const wasteEl = document.getElementById('wasteItems');
+if (wasteEl) progressObserver.observe(wasteEl);
+</script>
+</body>
+</html>

@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard – RePlate</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="global.css">
+    <style>
+        .dash-wrap { max-width: 1280px; margin: 0 auto; padding: 90px 5% 60px; }
+        
+        /* GREETING */
+        .greeting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .greeting-row h1 { font-size: clamp(22px, 3vw, 32px); margin-bottom: 4px; }
+        .greeting-row p { color: var(--muted); font-size: 15px; }
+        .greeting-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        /* STATS */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 36px;
+        }
+        .stat-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 24px;
+            border: 1.5px solid var(--border);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--green);
+            transform: scaleX(0);
+            transition: transform 0.3s;
+        }
+        .stat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+        .stat-card:hover::after { transform: scaleX(1); }
+        .stat-card.amber::after { background: var(--amber); }
+        .stat-card.blue::after { background: #1976D2; }
+        .stat-card.purple::after { background: #7B1FA2; }
+        .stat-icon {
+            width: 48px; height: 48px; border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; margin-bottom: 16px;
+        }
+        .si-green { background: rgba(46,125,50,0.1); color: var(--green); }
+        .si-amber { background: rgba(245,124,0,0.1); color: var(--amber); }
+        .si-blue { background: rgba(25,118,210,0.1); color: #1976D2; }
+        .si-purple { background: rgba(123,31,162,0.1); color: #7B1FA2; }
+        .stat-card h3 { font-size: 30px; font-weight: 800; margin-bottom: 4px; }
+        .stat-card p { font-size: 13px; color: var(--muted); }
+        .stat-change { font-size: 12px; margin-top: 8px; display: flex; align-items: center; gap: 4px; }
+        .stat-change.up { color: var(--green); }
+        .stat-change.down { color: var(--red); }
+
+        /* MAIN GRID */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 20px;
+        }
+        
+        /* LEFTOVERS SECTION */
+        .section-card {
+            background: white;
+            border-radius: var(--radius);
+            border: 1.5px solid var(--border);
+            overflow: hidden;
+        }
+        .section-card-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .section-card-header h2 { font-size: 18px; }
+        .section-card-body { padding: 20px 24px; }
+
+        .food-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+        }
+        .food-card {
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1.5px solid var(--border);
+            transition: var(--transition);
+            background: white;
+            cursor: pointer;
+        }
+        .food-card:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-color: var(--green); }
+        .food-card img { width: 100%; height: 140px; object-fit: cover; }
+        .food-card-body { padding: 14px; }
+        .food-card-body h4 { font-size: 15px; margin-bottom: 4px; }
+        .food-card-body .meta { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+        .food-card-footer { display: flex; justify-content: space-between; align-items: center; }
+
+        /* RIGHT SIDEBAR */
+        .sidebar-stack { display: flex; flex-direction: column; gap: 20px; }
+
+        /* EXPIRING SOON */
+        .expiry-list { display: flex; flex-direction: column; gap: 12px; }
+        .expiry-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 12px;
+            background: var(--bg);
+            transition: var(--transition);
+        }
+        .expiry-item:hover { background: #FFF3E0; }
+        .expiry-emoji { font-size: 24px; flex-shrink: 0; }
+        .expiry-info { flex: 1; min-width: 0; }
+        .expiry-info h5 { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+        .expiry-info p { font-size: 12px; color: var(--muted); }
+        .expiry-time { font-size: 12px; font-weight: 700; color: var(--amber); white-space: nowrap; }
+
+        /* QUICK ACTIONS */
+        .quick-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .qa-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 16px 12px;
+            background: var(--bg);
+            border: 1.5px solid var(--border);
+            border-radius: 14px;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+            transition: var(--transition);
+        }
+        .qa-btn:hover { background: rgba(46,125,50,0.06); border-color: var(--green); color: var(--green); }
+        .qa-btn i { font-size: 22px; color: var(--green); }
+
+        /* DAILY TIP */
+        .tip-card {
+            background: linear-gradient(135deg, #E8F5E9, #F1F8E9);
+            border: 1.5px solid rgba(46,125,50,0.2);
+            border-radius: var(--radius);
+            padding: 20px;
+        }
+        .tip-card h4 { font-size: 14px; font-weight: 700; margin-bottom: 8px; color: var(--green); display: flex; align-items: center; gap: 6px; }
+        .tip-card p { font-size: 14px; line-height: 1.6; color: #2E4A2F; }
+
+        /* MODAL FORM */
+        .emoji-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .emoji-opt {
+            width: 100%;
+            aspect-ratio: 1;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            background: var(--bg);
+            cursor: pointer;
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+        .emoji-opt.selected, .emoji-opt:hover { border-color: var(--green); background: rgba(46,125,50,0.08); }
+
+        @media (max-width: 1024px) {
+            .main-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 600px) {
+            .food-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 400px) {
+            .stats-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar" id="navbar">
+    <div class="nav-inner">
+        <a href="index.html" class="logo">Re<span>Plate</span></a>
+        <ul class="nav-links">
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="recipes.html">Recipes</a></li>
+            <li><a href="analytics.html">Analytics</a></li>
+            <li><a href="challenge.html">Challenge</a></li>
+            <li><a href="inventory.html">Inventory</a></li>
+        </ul>
+        <div class="nav-actions">
+            <a href="inventory.html" class="btn-primary"><i class="fa-solid fa-plus"></i> Add Food</a>
+            <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+        </div>
+    </div>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+    <ul>
+        <li><a href="dashboard.html">Dashboard</a></li>
+        <li><a href="recipes.html">Recipes</a></li>
+        <li><a href="analytics.html">Analytics</a></li>
+        <li><a href="challenge.html">Challenge</a></li>
+        <li><a href="inventory.html">Inventory</a></li>
+    </ul>
+</div>
+
+<div class="dash-wrap">
+
+    <!-- GREETING -->
+    <div class="greeting-row reveal">
+        <div>
+            <h1>Good Evening, Kumar Family 👋</h1>
+            <p id="dashDate">Loading date...</p>
+        </div>
+        <div class="greeting-actions">
+            <a href="analytics.html" class="btn-secondary"><i class="fa-solid fa-chart-pie"></i> Analytics</a>
+            <button class="btn-primary" onclick="openModal('addFoodModal')"><i class="fa-solid fa-plus"></i> Log Food</button>
+        </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-grid reveal">
+        <div class="stat-card">
+            <div class="stat-icon si-green"><i class="fa-solid fa-bowl-food"></i></div>
+            <h3 id="cnt-leftovers">0</h3>
+            <p>Leftovers Tracked</p>
+            <div class="stat-change up"><i class="fa-solid fa-arrow-up"></i> +2 this week</div>
+        </div>
+        <div class="stat-card amber">
+            <div class="stat-icon si-amber"><i class="fa-solid fa-clock"></i></div>
+            <h3 id="cnt-expiring">0</h3>
+            <p>Expiring Soon</p>
+            <div class="stat-change down"><i class="fa-solid fa-exclamation"></i> Act now</div>
+        </div>
+        <div class="stat-card blue">
+            <div class="stat-icon si-blue"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+            <h3 id="cnt-savings">₹0</h3>
+            <p>Saved This Month</p>
+            <div class="stat-change up"><i class="fa-solid fa-arrow-up"></i> ₹80 vs last month</div>
+        </div>
+        <div class="stat-card purple">
+            <div class="stat-icon si-purple"><i class="fa-solid fa-leaf"></i></div>
+            <h3 id="cnt-co2">0kg</h3>
+            <p>CO₂ Reduced</p>
+            <div class="stat-change up"><i class="fa-solid fa-arrow-up"></i> Great progress!</div>
+        </div>
+    </div>
+
+    <!-- MAIN GRID -->
+    <div class="main-grid">
+        <!-- LEFT -->
+        <div>
+            <!-- LEFTOVERS -->
+            <div class="section-card reveal" style="margin-bottom: 20px;">
+                <div class="section-card-header">
+                    <h2>Today's Leftovers</h2>
+                    <a href="inventory.html" class="btn-secondary" style="font-size:13px;padding:7px 14px;">View All</a>
+                </div>
+                <div class="section-card-body">
+                    <div class="food-grid" id="foodGrid">
+                        <div class="food-card">
+                            <img src="https://static01.nyt.com/images/2018/02/21/dining/00RICEGUIDE8/00RICEGUIDE8-threeByTwoLargeAt2X.jpg" alt="Rice" loading="lazy">
+                            <div class="food-card-body">
+                                <h4>Cooked Rice</h4>
+                                <p class="meta">2 Servings • Added today</p>
+                                <div class="food-card-footer">
+                                    <span class="badge badge-urgent">24h left</span>
+                                    <a href="recipes.html" style="font-size:12px;color:var(--green);font-weight:600;">Recipes →</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="food-card">
+                            <img src="https://www.indianhealthyrecipes.com/wp-content/uploads/2023/02/paneer-curry-recipe.jpg" alt="Paneer Curry" loading="lazy">
+                            <div class="food-card-body">
+                                <h4>Paneer Curry</h4>
+                                <p class="meta">1 Bowl • Added yesterday</p>
+                                <div class="food-card-footer">
+                                    <span class="badge badge-safe">Fresh</span>
+                                    <a href="recipes.html" style="font-size:12px;color:var(--green);font-weight:600;">Recipes →</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="food-card">
+                            <img src="https://bakinghermann.com/wp-content/uploads/2024/11/Dal-Tadka-12.jpg" alt="Dal" loading="lazy">
+                            <div class="food-card-body">
+                                <h4>Dal Tadka</h4>
+                                <p class="meta">3 Servings • Added today</p>
+                                <div class="food-card-footer">
+                                    <span class="badge badge-safe">2 days</span>
+                                    <a href="recipes.html" style="font-size:12px;color:var(--green);font-weight:600;">Recipes →</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="food-card">
+                            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTxtIKiASGoVcRV3YBXqI1bc7TTfGqDWrqMtA&s" alt="Roti" loading="lazy">
+                            <div class="food-card-body">
+                                <h4>Leftover Roti</h4>
+                                <p class="meta">4 pieces • Added today</p>
+                                <div class="food-card-footer">
+                                    <span class="badge badge-warning">Today</span>
+                                    <a href="recipes.html" style="font-size:12px;color:var(--green);font-weight:600;">Recipes →</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI RECIPES TEASER -->
+            <div class="section-card reveal">
+                <div class="section-card-header">
+                    <h2>✨ AI Recipe Suggestions</h2>
+                    <a href="recipes.html" class="btn-primary" style="font-size:13px;padding:7px 14px;">See All</a>
+                </div>
+                <div class="section-card-body" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;">
+                    <div style="border-radius:12px;overflow:hidden;border:1.5px solid var(--border);cursor:pointer;transition:var(--transition);" onmouseenter="this.style.transform='translateY(-3px)'" onmouseleave="this.style.transform=''">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRCmYaBQX9pZlzzuPDDTOd8Zxgo0XIPxgyzyQ&s" style="width:100%;height:120px;object-fit:cover;" loading="lazy">
+                        <div style="padding:12px;">
+                            <div style="font-weight:700;font-size:14px;margin-bottom:4px;">Vegetable Fried Rice</div>
+                            <div style="font-size:12px;color:var(--muted);">15 min • Easy</div>
+                        </div>
+                    </div>
+                    <div style="border-radius:12px;overflow:hidden;border:1.5px solid var(--border);cursor:pointer;transition:var(--transition);" onmouseenter="this.style.transform='translateY(-3px)'" onmouseleave="this.style.transform=''">
+                        <img src="https://www.indianveggiedelight.com/wp-content/uploads/2017/06/final_1_rice_cutlet-min.jpg" style="width:100%;height:120px;object-fit:cover;" loading="lazy">
+                        <div style="padding:12px;">
+                            <div style="font-weight:700;font-size:14px;margin-bottom:4px;">Rice Cutlets</div>
+                            <div style="font-size:12px;color:var(--muted);">20 min • Medium</div>
+                        </div>
+                    </div>
+                    <div style="border-radius:12px;overflow:hidden;border:1.5px solid var(--border);cursor:pointer;transition:var(--transition);" onmouseenter="this.style.transform='translateY(-3px)'" onmouseleave="this.style.transform=''">
+                        <img src="https://static.toiimg.com/thumb/53870704.cms?width=1200&height=900" style="width:100%;height:120px;object-fit:cover;" loading="lazy">
+                        <div style="padding:12px;">
+                            <div style="font-weight:700;font-size:14px;margin-bottom:4px;">Lemon Rice</div>
+                            <div style="font-size:12px;color:var(--muted);">10 min • Easy</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT SIDEBAR -->
+        <div class="sidebar-stack">
+            <!-- EXPIRING SOON -->
+            <div class="section-card reveal">
+                <div class="section-card-header">
+                    <h2>⚠️ Expiring Soon</h2>
+                    <span class="badge badge-urgent">2 items</span>
+                </div>
+                <div class="section-card-body">
+                    <div class="expiry-list">
+                        <div class="expiry-item">
+                            <span class="expiry-emoji">🍚</span>
+                            <div class="expiry-info">
+                                <h5>Cooked Rice</h5>
+                                <p>2 servings</p>
+                            </div>
+                            <span class="expiry-time">24h</span>
+                        </div>
+                        <div class="expiry-item">
+                            <span class="expiry-emoji">🫓</span>
+                            <div class="expiry-info">
+                                <h5>Leftover Roti</h5>
+                                <p>4 pieces</p>
+                            </div>
+                            <span class="expiry-time">Today</span>
+                        </div>
+                    </div>
+                    <a href="recipes.html" class="btn-amber" style="width:100%;justify-content:center;margin-top:16px;border-radius:10px;">
+                        Use Now – Get Recipes
+                    </a>
+                </div>
+            </div>
+
+            <!-- QUICK ACTIONS -->
+            <div class="section-card reveal">
+                <div class="section-card-header"><h2>Quick Actions</h2></div>
+                <div class="section-card-body">
+                    <div class="quick-actions">
+                        <button class="qa-btn" onclick="openModal('addFoodModal')">
+                            <i class="fa-solid fa-plus"></i>
+                            <span>Add Food</span>
+                        </button>
+                        <a href="recipes.html" class="qa-btn" style="text-decoration:none;color:inherit;">
+                            <i class="fa-solid fa-hat-chef"></i>
+                            <span>Recipes</span>
+                        </a>
+                        <a href="analytics.html" class="qa-btn" style="text-decoration:none;color:inherit;">
+                            <i class="fa-solid fa-chart-bar"></i>
+                            <span>Analytics</span>
+                        </a>
+                        <a href="challenge.html" class="qa-btn" style="text-decoration:none;color:inherit;">
+                            <i class="fa-solid fa-trophy"></i>
+                            <span>Challenge</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DAILY TIP -->
+            <div class="tip-card reveal">
+                <h4><i class="fa-solid fa-lightbulb"></i> Today's Tip</h4>
+                <p>Store cooked rice in an airtight container and use within 24 hours. Day-old rice makes the best fried rice!</p>
+            </div>
+
+            <!-- CHALLENGE PROGRESS -->
+            <div class="section-card reveal">
+                <div class="section-card-header"><h2>🏆 Current Challenge</h2></div>
+                <div class="section-card-body">
+                    <p style="font-size:14px;font-weight:600;margin-bottom:8px;">3-Day Zero Waste Streak</p>
+                    <div class="progress-bar"><div class="progress-fill" style="width:60%" id="challengeBar"></div></div>
+                    <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:12px;color:var(--muted);">
+                        <span>Day 2 of 3</span>
+                        <span>60%</span>
+                    </div>
+                    <span class="badge badge-safe" style="margin-top:12px;">🥉 Bronze Badge Earned</span>
+                    <a href="challenge.html" class="btn-secondary" style="width:100%;justify-content:center;margin-top:12px;font-size:13px;">View Challenge</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- ADD FOOD MODAL -->
+<div class="modal-overlay" id="addFoodModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>Log Food Item</h3>
+            <button class="modal-close" onclick="closeModal('addFoodModal')"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="form-group">
+            <label>Choose Food Emoji</label>
+            <div class="emoji-grid" id="emojiGrid">
+                <button class="emoji-opt selected" onclick="selectEmoji(this, '🍚')">🍚</button>
+                <button class="emoji-opt" onclick="selectEmoji(this, '🍛')">🍛</button>
+                <button class="emoji-opt" onclick="selectEmoji(this, '🫓')">🫓</button>
+                <button class="emoji-opt" onclick="selectEmoji(this, '🫘')">🫘</button>
+                <button class="emoji-opt" onclick="selectEmoji(this, '🥘')">🥘</button>
+                <button class="emoji-opt" onclick="selectEmoji(this, '🍲')">🍲</button>
+                <button class="emoji-opt" onclick="selectEmoji(this, '🥗')">🥗</button>
+                <button class="emoji-opt" onclick="selectEmoji(this, '🍜')">🍜</button>
+                <button class="emoji-opt" onclick="selectEmoji(this, '🥙')">🥙</button>
+                <button class="emoji-opt" onclick="selectEmoji(this, '🧆')">🧆</button>
+                <button class="emoji-opt" onclick="selectEmoji(this, '🥕')">🥕</button>
+                <button class="emoji-opt" onclick="selectEmoji(this, '🍅')">🍅</button>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Food Name *</label>
+            <input type="text" id="foodName" placeholder="e.g. Cooked Rice, Paneer Curry...">
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Quantity</label>
+                <input type="text" id="foodQty" placeholder="e.g. 2 servings">
+            </div>
+            <div class="form-group">
+                <label>Expires In</label>
+                <select id="foodExpiry">
+                    <option>Today</option>
+                    <option>24 hours</option>
+                    <option>2 days</option>
+                    <option>3 days</option>
+                    <option>1 week</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Category</label>
+            <select id="foodCat">
+                <option>Rice & Grains</option>
+                <option>Curry & Sabzi</option>
+                <option>Bread & Rotis</option>
+                <option>Dal & Lentils</option>
+                <option>Snacks</option>
+                <option>Sweets & Desserts</option>
+                <option>Other</option>
+            </select>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:8px;">
+            <button class="btn-secondary" style="flex:1;justify-content:center;" onclick="closeModal('addFoodModal')">Cancel</button>
+            <button class="btn-primary" style="flex:2;justify-content:center;" onclick="addFood()">Add to Kitchen</button>
+        </div>
+    </div>
+</div>
+
+<button class="fab" onclick="openModal('addFoodModal')" title="Add Food"><i class="fa-solid fa-plus"></i></button>
+
+<footer class="footer">
+    <div class="footer-inner">
+        <div class="footer-brand">
+            <div class="logo">Re<span>Plate</span></div>
+            <p>Smart food waste reduction for Indian families.</p>
+        </div>
+        <div class="footer-links">
+            <div class="footer-col">
+                <h5>App</h5>
+                <ul>
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                    <li><a href="inventory.html">Inventory</a></li>
+                    <li><a href="recipes.html">Recipes</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h5>Insights</h5>
+                <ul>
+                    <li><a href="analytics.html">Analytics</a></li>
+                    <li><a href="challenge.html">Challenges</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 RePlate – Smart Food Saver | Designed by Team 10</p></div>
+</footer>
+
+<script src="global.js"></script>
+<script>
+    // Date
+    const now = new Date();
+    const opts = { weekday:'long', year:'numeric', month:'long', day:'numeric' };
+    document.getElementById('dashDate').textContent = now.toLocaleDateString('en-IN', opts);
+
+    // Counters
+    const leftovers = document.getElementById('cnt-leftovers');
+    const expiring = document.getElementById('cnt-expiring');
+    const savings = document.getElementById('cnt-savings');
+    const co2 = document.getElementById('cnt-co2');
+
+    const obs = new IntersectionObserver(entries => {
+        if (entries[0].isIntersecting) {
+            animateCounter(leftovers, 4);
+            animateCounter(expiring, 2);
+            // savings custom
+            let s = 0;
+            const si = setInterval(() => {
+                s += 14;
+                if (s >= 420) { s = 420; clearInterval(si); }
+                savings.textContent = '₹' + s;
+            }, 30);
+            // co2 custom
+            let c = 0;
+            const ci = setInterval(() => {
+                c += 0.07;
+                if (c >= 2.1) { c = 2.1; clearInterval(ci); }
+                co2.textContent = c.toFixed(1) + 'kg';
+            }, 30);
+            obs.disconnect();
+        }
+    }, { threshold: 0.3 });
+    obs.observe(document.querySelector('.stats-grid'));
+
+    // Emoji selector
+    let selectedEmoji = '🍚';
+    function selectEmoji(btn, emoji) {
+        document.querySelectorAll('.emoji-opt').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        selectedEmoji = emoji;
+    }
+
+    // Add food
+    function addFood() {
+        const name = document.getElementById('foodName').value.trim();
+        if (!name) { showToast('Please enter a food name!', 'warning'); return; }
+        closeModal('addFoodModal');
+        showToast(`${selectedEmoji} ${name} added to your kitchen!`, 'success');
+        document.getElementById('foodName').value = '';
+    }
+</script>
+</body>
+</html>
