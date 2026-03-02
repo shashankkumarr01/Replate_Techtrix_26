@@ -1,0 +1,913 @@
+/* ============================================================
+   REPLATE DARK MODE CSS v3.0
+   Black + Purple Neon Cyberpunk Theme
+   
+   KEY FIXES vs v2:
+   - No global transition !important override (was breaking button clicks)
+   - No ::before pseudo-elements on cards (was blocking pointer events)
+   - No hologram scan divs
+   - Mobile hamburger always visible and interactive
+   - All buttons, recipe cards, modals fully functional
+   ============================================================ */
+
+/* ── CSS VARS (dark values) ── */
+:root {
+    --dm-bg:     #06060f;
+    --dm-deep:   #0a0a1a;
+    --dm-card:   rgba(14, 8, 32, 0.80);
+    --dm-purple: #b44dff;
+    --dm-p2:     #8a2be2;
+    --dm-p3:     #6600cc;
+    --dm-pink:   #e040fb;
+    --dm-text:   #f0e6ff;
+    --dm-muted:  #9d8fba;
+    --dm-border: rgba(138, 43, 226, 0.28);
+}
+
+/* ════════════════════════════════════════════════════
+   BODY + CSS VARIABLE OVERRIDES
+   ════════════════════════════════════════════════════ */
+body.dark-mode {
+    --bg:          var(--dm-bg);
+    --white:       var(--dm-deep);
+    --text:        var(--dm-text);
+    --muted:       var(--dm-muted);
+    --border:      var(--dm-border);
+    --card:        var(--dm-card);
+    --shadow:      0 4px 30px rgba(138,43,226,0.18);
+    --shadow-lg:   0 12px 60px rgba(138,43,226,0.35);
+    --green:       var(--dm-purple);
+    --green-dark:  var(--dm-p2);
+    --green-light: rgba(180,77,255,0.15);
+    --amber:       #cc44ff;
+    --amber-light: rgba(204,68,255,0.12);
+    --red:         #ff55ff;
+    --red-light:   rgba(255,85,255,0.12);
+    background: var(--dm-bg);
+    color: var(--dm-text);
+}
+
+/* Prevent flash on dark page load */
+html.dark-init { background: #06060f !important; }
+
+/* ════════════════════════════════════════════════════
+   1. 🎮 CYBERPUNK GRID BACKGROUND
+   z-index -3, pointer-events none — never blocks anything
+   ════════════════════════════════════════════════════ */
+body.dark-mode::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -3;
+    pointer-events: none;
+    background:
+        linear-gradient(rgba(138,43,226,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(138,43,226,0.04) 1px, transparent 1px),
+        radial-gradient(ellipse at 15% 20%, rgba(138,43,226,0.20) 0%, transparent 55%),
+        radial-gradient(ellipse at 85% 80%, rgba(100,0,200,0.16) 0%, transparent 55%),
+        radial-gradient(ellipse at 50% 50%, rgba(30,0,80,0.45) 0%, transparent 75%),
+        #06060f;
+    background-size: 60px 60px, 60px 60px, 100% 100%, 100% 100%, 100% 100%;
+    animation: gridShift 20s linear infinite;
+}
+@keyframes gridShift {
+    0%   { background-position: 0 0, 0 0, 0 0, 0 0, 0 0; }
+    100% { background-position: 60px 60px, 60px 60px, 0 0, 0 0, 0 0; }
+}
+
+/* ════════════════════════════════════════════════════
+   2. 🌑 ANIMATED ORB LAYER
+   z-index -2, pointer-events none
+   ════════════════════════════════════════════════════ */
+body.dark-mode::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    pointer-events: none;
+    background:
+        radial-gradient(circle 380px at 18% 28%, rgba(180,77,255,0.09) 0%, transparent 100%),
+        radial-gradient(circle 260px at 82% 72%, rgba(100,0,255,0.08) 0%, transparent 100%),
+        radial-gradient(circle 200px at 60% 12%, rgba(200,0,255,0.06) 0%, transparent 100%);
+    animation: orbFloat 14s ease-in-out infinite alternate;
+}
+@keyframes orbFloat {
+    0%,100% { opacity: 0.7; }
+    50%     { opacity: 1.0; }
+}
+
+/* ════════════════════════════════════════════════════
+   3. 🌠 CURSOR GLOW (injected by JS)
+   pointer-events: none always
+   ════════════════════════════════════════════════════ */
+.cursor-glow {
+    display: none;
+    position: fixed;
+    pointer-events: none !important;
+    z-index: 9997;
+    width: 360px;
+    height: 360px;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, rgba(180,77,255,0.065) 0%, transparent 70%);
+    /* No transition override — let it move instantly */
+    transition: left 0.06s linear, top 0.06s linear;
+}
+body.dark-mode .cursor-glow { display: block; }
+
+/* ════════════════════════════════════════════════════
+   4. 🎮 MATRIX CANVAS (injected by JS)
+   pointer-events: none, low z-index
+   ════════════════════════════════════════════════════ */
+#matrixCanvas {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none !important;
+}
+body.dark-mode #matrixCanvas { display: block; opacity: 0.05; }
+
+/* ════════════════════════════════════════════════════
+   5. 🧠 AI LOADER (full-screen, shown briefly)
+   ════════════════════════════════════════════════════ */
+.ai-loader {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    background: #06060f;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 24px;
+}
+.ai-loader.active { display: flex; }
+
+.ai-loader-ring {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    border: 3px solid rgba(180,77,255,0.15);
+    border-top-color: var(--dm-purple);
+    animation: loaderSpin 1s linear infinite;
+    position: relative;
+}
+.ai-loader-ring::before {
+    content: '';
+    position: absolute;
+    inset: 6px;
+    border-radius: 50%;
+    border: 2px solid rgba(180,77,255,0.1);
+    border-bottom-color: var(--dm-pink);
+    animation: loaderSpin 0.7s linear infinite reverse;
+}
+.ai-loader-ring::after {
+    content: '🤖';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    animation: loaderPulse 1.5s ease-in-out infinite;
+}
+.ai-loader-text {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    color: var(--dm-purple);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    animation: loaderPulse 1.5s ease-in-out infinite;
+}
+.ai-loader-bar {
+    width: 200px; height: 2px;
+    background: rgba(180,77,255,0.15);
+    border-radius: 1px;
+    overflow: hidden;
+}
+.ai-loader-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--dm-p3), var(--dm-purple), var(--dm-pink));
+    border-radius: 1px;
+    animation: loaderFill 1.8s ease-in-out forwards;
+    box-shadow: 0 0 10px rgba(180,77,255,0.8);
+}
+@keyframes loaderSpin  { to { transform: rotate(360deg); } }
+@keyframes loaderPulse { 0%,100%{opacity:0.6} 50%{opacity:1} }
+@keyframes loaderFill  { 0%{width:0} 100%{width:100%} }
+
+/* ════════════════════════════════════════════════════
+   6. DARK MODE TOGGLE BUTTON
+   ════════════════════════════════════════════════════ */
+.dm-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 13px;
+    border-radius: 100px;
+    border: 1.5px solid var(--border);
+    background: var(--card);
+    cursor: pointer !important;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+    flex-shrink: 0;
+    /* Only transition visual props — no transform/pointer interference */
+    transition: border-color 0.3s, background 0.3s, box-shadow 0.3s, transform 0.2s;
+    position: relative;
+    z-index: 101;
+    pointer-events: auto !important;
+}
+.dm-toggle-track {
+    position: relative;
+    width: 38px; height: 20px;
+    background: #ccc;
+    border-radius: 10px;
+    flex-shrink: 0;
+    pointer-events: none;
+    transition: background 0.35s;
+}
+.dm-toggle-track::after {
+    content: '';
+    position: absolute;
+    top: 2px; left: 2px;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: white;
+    transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    pointer-events: none;
+}
+.dm-toggle-icon  { font-size: 15px; pointer-events: none; transition: transform 0.5s; }
+.dm-toggle-label { font-size: 13px; pointer-events: none; }
+
+body.dark-mode .dm-toggle {
+    border-color: rgba(180,77,255,0.5) !important;
+    color: var(--dm-text) !important;
+    background: rgba(14,8,32,0.9) !important;
+    box-shadow: 0 0 16px rgba(180,77,255,0.28) !important;
+}
+body.dark-mode .dm-toggle:hover {
+    box-shadow: 0 0 26px rgba(180,77,255,0.55) !important;
+    transform: scale(1.04);
+}
+body.dark-mode .dm-toggle-track {
+    background: linear-gradient(135deg, var(--dm-p2), var(--dm-purple));
+    box-shadow: 0 0 8px rgba(180,77,255,0.45);
+}
+body.dark-mode .dm-toggle-track::after { transform: translateX(18px); }
+body.dark-mode .dm-toggle-icon { transform: rotate(360deg); }
+
+/* ════════════════════════════════════════════════════
+   7. 💎 GLASSMORPHISM CARDS
+   CRITICAL: No z-index, no ::before/::after that block clicks
+   position: relative only if card already has it
+   ════════════════════════════════════════════════════ */
+body.dark-mode .stat-card,
+body.dark-mode .food-card,
+body.dark-mode .recipe-card,
+body.dark-mode .section-card,
+body.dark-mode .analytics-card,
+body.dark-mode .testi-card,
+body.dark-mode .feature-card,
+body.dark-mode .insight-card,
+body.dark-mode .avail-card,
+body.dark-mode .badge-card,
+body.dark-mode .leaderboard-card,
+body.dark-mode .current-challenge-card,
+body.dark-mode .chart-card,
+body.dark-mode .waste-breakdown,
+body.dark-mode .metric-card,
+body.dark-mode .sum-card,
+body.dark-mode .inv-table-wrap,
+body.dark-mode .points-card,
+body.dark-mode .tip-card,
+body.dark-mode .inv-grid-card {
+    background: var(--dm-card) !important;
+    border: 1px solid rgba(138,43,226,0.28) !important;
+    backdrop-filter: blur(18px) saturate(1.4) !important;
+    -webkit-backdrop-filter: blur(18px) saturate(1.4) !important;
+    box-shadow: 0 4px 28px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04) !important;
+    /* NO z-index override */
+    /* NO ::before pseudo - would intercept clicks */
+}
+body.dark-mode .stat-card:hover,
+body.dark-mode .food-card:hover,
+body.dark-mode .recipe-card:hover,
+body.dark-mode .feature-card:hover,
+body.dark-mode .testi-card:hover,
+body.dark-mode .avail-card:hover,
+body.dark-mode .badge-card:hover,
+body.dark-mode .inv-grid-card:hover,
+body.dark-mode .metric-card:hover,
+body.dark-mode .section-card:hover {
+    background: rgba(22, 8, 55, 0.88) !important;
+    border-color: rgba(180,77,255,0.52) !important;
+    box-shadow:
+        0 8px 42px rgba(0,0,0,0.6),
+        0 0 26px rgba(180,77,255,0.18),
+        inset 0 1px 0 rgba(255,255,255,0.07) !important;
+    transform: translateY(-5px) !important;
+    /* outline for the glow border effect — safe, doesn't block clicks */
+    outline: 1px solid rgba(180,77,255,0.32);
+    outline-offset: 0;
+}
+
+/* ════════════════════════════════════════════════════
+   8. 🌌 HOLOGRAPHIC FLOATING STATS
+   ════════════════════════════════════════════════════ */
+body.dark-mode .stat-card h3,
+body.dark-mode .metric-card h3,
+body.dark-mode .sum-card h3,
+body.dark-mode .points-num {
+    color: #cc88ff !important;
+    text-shadow:
+        0 0 10px rgba(180,77,255,0.9),
+        0 0 20px rgba(180,77,255,0.55),
+        0 0 40px rgba(180,77,255,0.25) !important;
+    animation: holoFloat 3.5s ease-in-out infinite;
+}
+@keyframes holoFloat {
+    0%,100% { text-shadow: 0 0 10px rgba(180,77,255,0.9),0 0 20px rgba(180,77,255,0.55),0 0 40px rgba(180,77,255,0.25); filter: hue-rotate(0deg); }
+    35%     { text-shadow: 0 0 14px rgba(0,229,255,0.8),0 0 28px rgba(0,229,255,0.4),0 0 55px rgba(0,229,255,0.12); filter: hue-rotate(25deg); }
+    70%     { text-shadow: 0 0 12px rgba(224,64,251,0.8),0 0 24px rgba(224,64,251,0.4),0 0 48px rgba(224,64,251,0.12); filter: hue-rotate(-15deg); }
+}
+
+/* ════════════════════════════════════════════════════
+   9. 🔥 GLOWING BUTTONS
+   All buttons: pointer-events auto, cursor pointer
+   ════════════════════════════════════════════════════ */
+body.dark-mode .btn-primary {
+    background: linear-gradient(135deg, var(--dm-p2), var(--dm-purple)) !important;
+    border: 1px solid rgba(180,77,255,0.45) !important;
+    color: white !important;
+    box-shadow: 0 0 16px rgba(180,77,255,0.38), 0 0 32px rgba(180,77,255,0.1) !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    transition: transform 0.2s, box-shadow 0.2s, background 0.2s !important;
+}
+body.dark-mode .btn-primary:hover {
+    background: linear-gradient(135deg, #9900ff, #d060ff) !important;
+    box-shadow: 0 0 28px rgba(180,77,255,0.75), 0 0 55px rgba(180,77,255,0.25) !important;
+    transform: translateY(-3px) !important;
+}
+
+body.dark-mode .btn-secondary {
+    background: transparent !important;
+    color: var(--dm-purple) !important;
+    border: 1.5px solid rgba(180,77,255,0.45) !important;
+    box-shadow: 0 0 10px rgba(180,77,255,0.1) !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    transition: transform 0.2s, box-shadow 0.2s, background 0.2s, color 0.2s !important;
+}
+body.dark-mode .btn-secondary:hover {
+    background: linear-gradient(135deg, var(--dm-p2), var(--dm-purple)) !important;
+    color: white !important;
+    border-color: var(--dm-purple) !important;
+    box-shadow: 0 0 26px rgba(180,77,255,0.6) !important;
+    transform: translateY(-2px) !important;
+}
+
+body.dark-mode .btn-amber {
+    background: linear-gradient(135deg, var(--dm-p3), #cc44ff) !important;
+    color: white !important;
+    box-shadow: 0 0 16px rgba(204,68,255,0.38) !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    transition: transform 0.2s, box-shadow 0.2s !important;
+}
+body.dark-mode .btn-amber:hover {
+    box-shadow: 0 0 30px rgba(204,68,255,0.7) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Small buttons in recipe cards */
+body.dark-mode .btn-sm-green {
+    background: linear-gradient(135deg, var(--dm-p2), var(--dm-purple)) !important;
+    color: white !important;
+    box-shadow: 0 0 12px rgba(180,77,255,0.35) !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    transition: transform 0.2s, box-shadow 0.2s !important;
+}
+body.dark-mode .btn-sm-green:hover {
+    box-shadow: 0 0 22px rgba(180,77,255,0.65) !important;
+    transform: translateY(-2px) !important;
+}
+
+body.dark-mode .btn-sm-outline {
+    background: transparent !important;
+    border: 1.5px solid rgba(138,43,226,0.38) !important;
+    color: var(--dm-muted) !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    transition: border-color 0.2s, color 0.2s !important;
+}
+body.dark-mode .btn-sm-outline:hover {
+    border-color: var(--dm-purple) !important;
+    color: var(--dm-purple) !important;
+}
+
+body.dark-mode .btn-white {
+    background: white !important;
+    color: var(--dm-p2) !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+}
+body.dark-mode .btn-white:hover { opacity: 0.9 !important; }
+
+/* FAB button */
+body.dark-mode .fab {
+    background: linear-gradient(135deg, var(--dm-p2), var(--dm-purple)) !important;
+    box-shadow: 0 0 22px rgba(180,77,255,0.55), 0 0 45px rgba(180,77,255,0.18) !important;
+    border: 1px solid rgba(180,77,255,0.38) !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    z-index: 500 !important;
+    transition: transform 0.3s, box-shadow 0.3s !important;
+}
+body.dark-mode .fab:hover {
+    box-shadow: 0 0 38px rgba(180,77,255,0.85), 0 0 75px rgba(180,77,255,0.3) !important;
+    transform: scale(1.12) rotate(90deg) !important;
+}
+
+/* ════════════════════════════════════════════════════
+   ENSURE ALL INTERACTIVE ELEMENTS ARE ALWAYS CLICKABLE
+   This is the key fix for "buttons not working in dark mode"
+   ════════════════════════════════════════════════════ */
+body.dark-mode button,
+body.dark-mode a,
+body.dark-mode input,
+body.dark-mode select,
+body.dark-mode textarea,
+body.dark-mode [onclick],
+body.dark-mode [role="button"],
+body.dark-mode .chip,
+body.dark-mode .cat-tab,
+body.dark-mode .tab-btn,
+body.dark-mode .period-btn,
+body.dark-mode .vt-btn,
+body.dark-mode .qa-btn,
+body.dark-mode .rc-save,
+body.dark-mode .emoji-opt,
+body.dark-mode .task-item,
+body.dark-mode .act-btn,
+body.dark-mode .hamburger {
+    pointer-events: auto !important;
+}
+body.dark-mode button,
+body.dark-mode [onclick],
+body.dark-mode [role="button"],
+body.dark-mode .chip,
+body.dark-mode .cat-tab,
+body.dark-mode .tab-btn,
+body.dark-mode .qa-btn,
+body.dark-mode .rc-save,
+body.dark-mode .emoji-opt,
+body.dark-mode .hamburger {
+    cursor: pointer !important;
+}
+body.dark-mode input[type="text"],
+body.dark-mode input[type="number"],
+body.dark-mode textarea { cursor: text !important; }
+
+/* ════════════════════════════════════════════════════
+   10. NAVBAR
+   ════════════════════════════════════════════════════ */
+body.dark-mode .navbar {
+    background: rgba(6,6,15,0.92) !important;
+    backdrop-filter: blur(26px) !important;
+    -webkit-backdrop-filter: blur(26px) !important;
+    border-bottom: 1px solid rgba(138,43,226,0.3) !important;
+    box-shadow: 0 2px 28px rgba(138,43,226,0.18) !important;
+    /* z-index already 1000 in global.css */
+}
+body.dark-mode .logo { color: var(--dm-text) !important; }
+body.dark-mode .logo span {
+    color: var(--dm-purple) !important;
+    text-shadow: 0 0 14px rgba(180,77,255,0.85), 0 0 28px rgba(180,77,255,0.4) !important;
+}
+body.dark-mode .nav-links li a { color: var(--dm-muted) !important; }
+body.dark-mode .nav-links li a:hover,
+body.dark-mode .nav-links li a.active {
+    color: var(--dm-purple) !important;
+    background: rgba(180,77,255,0.1) !important;
+}
+
+/* ════════════════════════════════════════════════════
+   11. HAMBURGER — always visible on mobile
+   ════════════════════════════════════════════════════ */
+body.dark-mode .hamburger span { background: var(--dm-text) !important; }
+body.dark-mode .hamburger:hover { background: rgba(180,77,255,0.12) !important; }
+
+/* ════════════════════════════════════════════════════
+   12. MOBILE MENU
+   High z-index, dark glass background, links clickable
+   ════════════════════════════════════════════════════ */
+body.dark-mode .mobile-menu {
+    background: rgba(7,5,20,0.98) !important;
+    backdrop-filter: blur(28px) !important;
+    -webkit-backdrop-filter: blur(28px) !important;
+    border-bottom: 1px solid rgba(138,43,226,0.3) !important;
+    box-shadow: 0 18px 45px rgba(0,0,0,0.85) !important;
+    /* z-index: 999 already in global.css */
+}
+body.dark-mode .mobile-menu ul li a {
+    color: var(--dm-muted) !important;
+    pointer-events: auto !important;
+}
+body.dark-mode .mobile-menu ul li a:hover {
+    background: rgba(180,77,255,0.12) !important;
+    color: var(--dm-purple) !important;
+}
+
+/* ════════════════════════════════════════════════════
+   13. MODAL — glass neon, fully interactive
+   ════════════════════════════════════════════════════ */
+body.dark-mode .modal-overlay {
+    background: rgba(0,0,0,0.82) !important;
+    backdrop-filter: blur(5px) !important;
+    z-index: 2000 !important;
+}
+body.dark-mode .modal {
+    background: rgba(10,5,28,0.97) !important;
+    border: 1px solid rgba(138,43,226,0.44) !important;
+    backdrop-filter: blur(34px) saturate(1.7) !important;
+    -webkit-backdrop-filter: blur(34px) saturate(1.7) !important;
+    box-shadow:
+        0 20px 75px rgba(0,0,0,0.72),
+        0 0 46px rgba(138,43,226,0.28),
+        inset 0 1px 0 rgba(255,255,255,0.06) !important;
+    z-index: 2001 !important;
+    position: relative;
+    overflow: hidden;
+}
+/* Top glow stripe — pointer-events none so it NEVER blocks anything */
+body.dark-mode .modal::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(180,77,255,0.8), rgba(0,229,255,0.5), rgba(180,77,255,0.8), transparent);
+    animation: modalGlow 3s ease-in-out infinite;
+    pointer-events: none !important;
+    z-index: 0;
+}
+/* ::before NOT used on modal — it was blocking clicks */
+@keyframes modalGlow { 0%,100%{opacity:0.6} 50%{opacity:1} }
+
+/* All modal direct children sit above the glow stripe */
+body.dark-mode .modal > * { position: relative; z-index: 2; }
+
+body.dark-mode .modal-close {
+    background: rgba(138,43,226,0.14) !important;
+    color: var(--dm-purple) !important;
+    border: 1px solid rgba(138,43,226,0.28) !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    transition: background 0.2s, box-shadow 0.2s !important;
+}
+body.dark-mode .modal-close:hover {
+    background: rgba(180,77,255,0.24) !important;
+    box-shadow: 0 0 12px rgba(180,77,255,0.28) !important;
+}
+
+/* ════════════════════════════════════════════════════
+   14. FORMS — fully functional
+   ════════════════════════════════════════════════════ */
+body.dark-mode .form-group input,
+body.dark-mode .form-group select,
+body.dark-mode .form-group textarea,
+body.dark-mode .search-box input,
+body.dark-mode .filter-select {
+    background: rgba(10,5,26,0.88) !important;
+    border: 2px solid rgba(138,43,226,0.32) !important;
+    color: var(--dm-text) !important;
+    pointer-events: auto !important;
+    transition: border-color 0.2s, box-shadow 0.2s !important;
+}
+body.dark-mode .form-group input:focus,
+body.dark-mode .form-group select:focus,
+body.dark-mode .form-group textarea:focus,
+body.dark-mode .search-box input:focus {
+    border-color: var(--dm-purple) !important;
+    box-shadow: 0 0 0 3px rgba(180,77,255,0.14), 0 0 12px rgba(180,77,255,0.18) !important;
+    outline: none !important;
+}
+body.dark-mode .form-group label { color: #c4aeff !important; }
+body.dark-mode input::placeholder,
+body.dark-mode textarea::placeholder { color: rgba(157,143,186,0.55) !important; }
+
+/* Emoji options in Add Food modal */
+body.dark-mode .emoji-opt {
+    background: rgba(18,8,40,0.85) !important;
+    border-color: rgba(138,43,226,0.28) !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    transition: background 0.2s, border-color 0.2s, box-shadow 0.2s !important;
+}
+body.dark-mode .emoji-opt:hover {
+    background: rgba(138,43,226,0.22) !important;
+    border-color: rgba(180,77,255,0.5) !important;
+}
+body.dark-mode .emoji-opt.selected {
+    background: rgba(138,43,226,0.26) !important;
+    border-color: var(--dm-purple) !important;
+    box-shadow: 0 0 10px rgba(180,77,255,0.28) !important;
+}
+
+/* ════════════════════════════════════════════════════
+   15. TEXT & TYPOGRAPHY
+   ════════════════════════════════════════════════════ */
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode h4,
+body.dark-mode h5 { color: var(--dm-text) !important; }
+body.dark-mode p { color: var(--dm-muted); }
+body.dark-mode strong { color: #e0d0ff !important; }
+body.dark-mode label { color: var(--dm-text) !important; }
+
+/* ════════════════════════════════════════════════════
+   16. BADGES
+   ════════════════════════════════════════════════════ */
+body.dark-mode .badge-safe     { background: rgba(180,77,255,0.17) !important; color: #cc88ff !important; border: 1px solid rgba(180,77,255,0.28) !important; }
+body.dark-mode .badge-urgent   { background: rgba(255,77,255,0.14) !important; color: #ff88ff !important; border: 1px solid rgba(255,77,255,0.28) !important; }
+body.dark-mode .badge-warning  { background: rgba(200,68,255,0.14) !important; color: #dd88ff !important; border: 1px solid rgba(200,68,255,0.28) !important; }
+body.dark-mode .badge-info     { background: rgba(100,0,255,0.16) !important;  color: #aa88ff !important; border: 1px solid rgba(100,0,255,0.28) !important; }
+
+/* Food item image badges */
+body.dark-mode .pfi-badge.safe   { background: rgba(180,77,255,0.2) !important; color: #cc88ff !important; }
+body.dark-mode .pfi-badge.urgent { background: rgba(255,77,255,0.14) !important; color: #ff88ff !important; }
+
+/* Recipe card badge */
+body.dark-mode .rc-badge {
+    background: rgba(14,8,32,0.92) !important;
+    color: var(--dm-muted) !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4) !important;
+}
+
+/* ════════════════════════════════════════════════════
+   17. PROGRESS BARS with animated shine
+   ════════════════════════════════════════════════════ */
+body.dark-mode .progress-bar { background: rgba(55,0,110,0.32) !important; }
+body.dark-mode .progress-fill,
+body.dark-mode .progress-fill.amber {
+    background: linear-gradient(90deg, var(--dm-p3), var(--dm-purple), var(--dm-pink)) !important;
+    box-shadow: 0 0 9px rgba(180,77,255,0.55) !important;
+    position: relative;
+    overflow: hidden;
+}
+body.dark-mode .progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0;
+    left: -100%;
+    width: 55%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.28), transparent);
+    animation: shimmer 2.5s ease-in-out infinite;
+    pointer-events: none;
+}
+@keyframes shimmer { to { left: 200%; } }
+
+/* ════════════════════════════════════════════════════
+   18. ICON CIRCLES
+   ════════════════════════════════════════════════════ */
+body.dark-mode .si-green, body.dark-mode .fc-icon.g  { background: rgba(180,77,255,0.14) !important; color: var(--dm-purple) !important; }
+body.dark-mode .si-amber, body.dark-mode .fc-icon.a  { background: rgba(153,0,255,0.14) !important;  color: #cc44ff !important; }
+body.dark-mode .si-blue,  body.dark-mode .fc-icon.b  { background: rgba(80,0,200,0.14) !important;   color: #9966ff !important; }
+body.dark-mode .si-purple,body.dark-mode .fc-icon.p  { background: rgba(120,0,200,0.14) !important;  color: #dd66ff !important; }
+body.dark-mode .ii-g { background: rgba(180,77,255,0.14) !important; color: var(--dm-purple) !important; }
+body.dark-mode .ii-a { background: rgba(153,0,255,0.14) !important;  color: #cc44ff !important; }
+body.dark-mode .ii-b { background: rgba(80,0,200,0.14) !important;   color: #9966ff !important; }
+body.dark-mode .ii-r { background: rgba(180,0,180,0.14) !important;  color: #ff66ff !important; }
+
+/* ════════════════════════════════════════════════════
+   19. CHIPS / TABS / FILTER BUTTONS
+   ════════════════════════════════════════════════════ */
+body.dark-mode .chip,
+body.dark-mode .cat-tab,
+body.dark-mode .period-btn,
+body.dark-mode .vt-btn,
+body.dark-mode .tab-btn {
+    background: rgba(14,8,32,0.78) !important;
+    border-color: rgba(138,43,226,0.28) !important;
+    color: var(--dm-muted) !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    transition: background 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s !important;
+}
+body.dark-mode .chip.active,
+body.dark-mode .cat-tab.active,
+body.dark-mode .period-btn.active,
+body.dark-mode .vt-btn.active {
+    background: linear-gradient(135deg, var(--dm-p2), var(--dm-purple)) !important;
+    border-color: var(--dm-purple) !important;
+    color: white !important;
+    box-shadow: 0 0 14px rgba(180,77,255,0.4) !important;
+}
+body.dark-mode .chip:hover,
+body.dark-mode .cat-tab:hover,
+body.dark-mode .period-btn:hover,
+body.dark-mode .vt-btn:hover {
+    background: rgba(138,43,226,0.2) !important;
+    border-color: rgba(180,77,255,0.5) !important;
+    color: var(--dm-purple) !important;
+}
+body.dark-mode .tab-btn.active {
+    background: rgba(180,77,255,0.15) !important;
+    color: var(--dm-purple) !important;
+    box-shadow: 0 0 12px rgba(180,77,255,0.2) !important;
+}
+
+/* ════════════════════════════════════════════════════
+   20. QUICK ACTION BUTTONS (dashboard sidebar)
+   ════════════════════════════════════════════════════ */
+body.dark-mode .qa-btn {
+    background: rgba(12,6,28,0.78) !important;
+    border-color: rgba(138,43,226,0.28) !important;
+    color: #e0d0ff !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    transition: background 0.2s, border-color 0.2s, color 0.2s !important;
+}
+body.dark-mode .qa-btn:hover {
+    background: rgba(138,43,226,0.18) !important;
+    border-color: var(--dm-purple) !important;
+    color: var(--dm-purple) !important;
+}
+body.dark-mode .qa-btn i { color: var(--dm-purple) !important; }
+
+/* ════════════════════════════════════════════════════
+   21. TABLE ACTION BUTTONS (inventory)
+   ════════════════════════════════════════════════════ */
+body.dark-mode .act-btn {
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    transition: background 0.2s, color 0.2s !important;
+}
+body.dark-mode .act-recipe { background: rgba(138,43,226,0.14) !important; color: var(--dm-purple) !important; }
+body.dark-mode .act-recipe:hover { background: var(--dm-purple) !important; color: white !important; }
+body.dark-mode .act-edit { background: rgba(80,0,200,0.14) !important; color: #9966ff !important; }
+body.dark-mode .act-edit:hover { background: #6600cc !important; color: white !important; }
+body.dark-mode .act-delete { background: rgba(180,0,180,0.14) !important; color: #ff66ff !important; }
+body.dark-mode .act-delete:hover { background: #990099 !important; color: white !important; }
+
+/* Recipe save button */
+body.dark-mode .rc-save {
+    background: rgba(12,6,28,0.88) !important;
+    color: var(--dm-muted) !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    z-index: 5 !important;
+    transition: background 0.2s, color 0.2s !important;
+}
+body.dark-mode .rc-save:hover,
+body.dark-mode .rc-save.saved {
+    background: rgba(180,0,180,0.2) !important;
+    color: #ff66ff !important;
+}
+
+/* ════════════════════════════════════════════════════
+   22. TABLE
+   ════════════════════════════════════════════════════ */
+body.dark-mode .inv-table th {
+    background: rgba(16,7,42,0.92) !important;
+    color: var(--dm-muted) !important;
+    border-bottom-color: rgba(138,43,226,0.28) !important;
+}
+body.dark-mode .inv-table td { border-bottom-color: rgba(138,43,226,0.1) !important; color: #e0d0ff !important; }
+body.dark-mode .inv-table tr:hover td { background: rgba(138,43,226,0.06) !important; }
+body.dark-mode .igc-delete { background: rgba(12,6,28,0.82) !important; color: var(--dm-muted) !important; pointer-events: auto !important; cursor: pointer !important; }
+body.dark-mode .igc-delete:hover { background: rgba(180,0,180,0.2) !important; color: #ff66ff !important; }
+
+/* ════════════════════════════════════════════════════
+   23. TOAST
+   pointer-events: none so it never blocks content
+   ════════════════════════════════════════════════════ */
+body.dark-mode .toast {
+    background: rgba(12,6,28,0.97) !important;
+    border: 1px solid rgba(180,77,255,0.38) !important;
+    box-shadow: 0 0 24px rgba(180,77,255,0.22), 0 8px 36px rgba(0,0,0,0.55) !important;
+    backdrop-filter: blur(18px) !important;
+    color: var(--dm-text) !important;
+    pointer-events: none !important;
+    z-index: 9999 !important;
+}
+
+/* ════════════════════════════════════════════════════
+   24. MISC INTERACTIVE ELEMENTS
+   ════════════════════════════════════════════════════ */
+body.dark-mode .expiry-item { background: rgba(16,7,42,0.6) !important; transition: background 0.2s !important; }
+body.dark-mode .expiry-item:hover { background: rgba(138,43,226,0.14) !important; }
+body.dark-mode .expiry-time { color: #cc44ff !important; }
+body.dark-mode .how-num { border-color: var(--dm-purple) !important; color: var(--dm-purple) !important; background: rgba(12,6,28,0.8) !important; transition: background 0.2s, color 0.2s, box-shadow 0.2s !important; }
+body.dark-mode .how-step:hover .how-num { background: var(--dm-purple) !important; color: white !important; box-shadow: 0 0 16px rgba(180,77,255,0.55) !important; }
+body.dark-mode .step-num { background: var(--dm-purple) !important; box-shadow: 0 0 9px rgba(180,77,255,0.48) !important; }
+body.dark-mode .ingredient-tag { background: rgba(180,77,255,0.14) !important; color: #cc88ff !important; border: 1px solid rgba(180,77,255,0.22) !important; }
+body.dark-mode .lb-item.you { background: rgba(138,43,226,0.1) !important; }
+body.dark-mode .lb-points { color: var(--dm-purple) !important; }
+body.dark-mode .task-item { background: rgba(16,7,42,0.6) !important; cursor: pointer !important; transition: background 0.2s !important; }
+body.dark-mode .task-item:hover { background: rgba(138,43,226,0.14) !important; }
+body.dark-mode .task-item.done .task-check { background: var(--dm-purple) !important; border-color: var(--dm-purple) !important; }
+body.dark-mode .day-circle.completed { background: var(--dm-purple) !important; border-color: var(--dm-purple) !important; }
+body.dark-mode .day-circle.current { border-color: var(--dm-purple) !important; color: var(--dm-purple) !important; }
+body.dark-mode .badge-card.earned { background: rgba(44,0,88,0.35) !important; border-color: rgba(180,77,255,0.48) !important; }
+body.dark-mode .earned-label { background: linear-gradient(135deg, var(--dm-p2), var(--dm-purple)) !important; }
+body.dark-mode .rank-pill { background: linear-gradient(135deg, var(--dm-p2), var(--dm-purple)) !important; }
+body.dark-mode .stat-card::after { background: linear-gradient(90deg, var(--dm-p2), var(--dm-purple)) !important; }
+body.dark-mode .sum-card.g h3 { color: var(--dm-purple) !important; }
+body.dark-mode .sum-card.a h3 { color: #cc44ff !important; }
+body.dark-mode .sum-card.r h3 { color: #ff66ff !important; }
+body.dark-mode .points-card { background: linear-gradient(135deg, rgba(20,5,50,0.92), rgba(36,0,72,0.88)) !important; border-color: rgba(180,77,255,0.28) !important; }
+body.dark-mode .section-card-header { border-bottom-color: rgba(138,43,226,0.2) !important; background: rgba(16,7,42,0.28) !important; }
+body.dark-mode .tip-card { background: linear-gradient(135deg, rgba(16,5,42,0.88), rgba(26,0,55,0.88)) !important; border-color: rgba(138,43,226,0.32) !important; }
+body.dark-mode .tip-card h4 { color: var(--dm-purple) !important; }
+body.dark-mode .tip-card p { color: #c4aeff !important; }
+body.dark-mode .stat-change.up   { color: #cc88ff !important; }
+body.dark-mode .stat-change.down { color: #ff88ff !important; }
+
+/* ════════════════════════════════════════════════════
+   25. SECTION BACKGROUNDS
+   ════════════════════════════════════════════════════ */
+body.dark-mode .featured-recipe {
+    background: linear-gradient(135deg, #0d0025, #1a0040, #0d0025) !important;
+    border: 1px solid rgba(138,43,226,0.38) !important;
+    box-shadow: 0 0 45px rgba(138,43,226,0.22) !important;
+}
+body.dark-mode .cta-section { background: linear-gradient(135deg, #0a001e, #140034, #0a001e) !important; }
+body.dark-mode .challenge-banner {
+    background: linear-gradient(135deg, #0a001e, #1a0040, #260058) !important;
+    border: 1px solid rgba(138,43,226,0.38) !important;
+}
+body.dark-mode .features     { background: rgba(8,5,20,0.55) !important; }
+body.dark-mode .testimonials { background: rgba(8,5,20,0.55) !important; }
+body.dark-mode .hero         { background: transparent !important; }
+body.dark-mode .hero-blob    { opacity: 0.07 !important; filter: blur(100px) saturate(2) !important; }
+body.dark-mode .floating-badge { background: rgba(10,5,26,0.96) !important; border: 1px solid rgba(138,43,226,0.38) !important; backdrop-filter: blur(18px) !important; color: var(--dm-text) !important; }
+body.dark-mode .phone-mockup { background: rgba(9,5,25,0.96) !important; border: 1px solid rgba(138,43,226,0.32) !important; box-shadow: 0 36px 75px rgba(0,0,0,0.6), 0 0 46px rgba(138,43,226,0.18) !important; }
+body.dark-mode .phone-screen { background: linear-gradient(160deg, #10052a, #0d0020) !important; }
+body.dark-mode .phone-food-item { background: rgba(18,7,48,0.88) !important; border: 1px solid rgba(138,43,226,0.18) !important; }
+body.dark-mode .phone-footer { background: var(--dm-purple) !important; }
+body.dark-mode .hero-stat strong { color: var(--dm-purple) !important; text-shadow: 0 0 11px rgba(180,77,255,0.65) !important; }
+body.dark-mode .how-grid::before { background: linear-gradient(90deg, var(--dm-purple), var(--dm-pink)) !important; }
+
+/* ════════════════════════════════════════════════════
+   26. FOOTER + LINKS
+   ════════════════════════════════════════════════════ */
+body.dark-mode .footer { background: rgba(5,5,12,0.98) !important; border-top: 1px solid rgba(138,43,226,0.22) !important; }
+body.dark-mode .footer-col h5 { color: rgba(138,43,226,0.58) !important; }
+body.dark-mode .footer-col ul li a { color: var(--dm-muted) !important; }
+body.dark-mode .footer-col ul li a:hover { color: var(--dm-purple) !important; }
+body.dark-mode .footer-bottom p { color: rgba(138,43,226,0.45) !important; }
+body.dark-mode .footer-brand p { color: rgba(115,95,155,0.68) !important; }
+body.dark-mode a:not([class*="btn"]):not(.logo):not(.dm-toggle) { color: var(--dm-purple) !important; }
+body.dark-mode .fc-link { color: var(--dm-purple) !important; }
+
+/* ════════════════════════════════════════════════════
+   27. SCROLLBAR + SELECTION
+   ════════════════════════════════════════════════════ */
+body.dark-mode ::-webkit-scrollbar { width: 5px; height: 5px; }
+body.dark-mode ::-webkit-scrollbar-track { background: #0a0a1a; }
+body.dark-mode ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, var(--dm-p2), var(--dm-purple)); border-radius: 3px; }
+body.dark-mode ::-webkit-scrollbar-thumb:hover { background: var(--dm-purple); }
+body.dark-mode ::selection { background: rgba(180,77,255,0.32); color: white; }
+
+/* ════════════════════════════════════════════════════
+   28. RESPONSIVE — mobile & tablet
+   ════════════════════════════════════════════════════ */
+
+/* Mobile: hamburger always shows, nav-links always hide */
+@media (max-width: 768px) {
+    .hamburger { display: flex !important; }
+    .nav-links  { display: none  !important; }
+
+    /* Hide toggle label to save space */
+    .dm-toggle-label { display: none !important; }
+    .dm-toggle { padding: 7px 10px !important; gap: 5px !important; }
+
+    /* Mobile menu must always be fixed, correct z-index */
+    .mobile-menu {
+        position: fixed !important;
+        top: 68px !important;
+        left: 0 !important;
+        right: 0 !important;
+        z-index: 999 !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .dm-toggle-track { width: 32px !important; height: 18px !important; }
+    .dm-toggle-track::after { width: 14px !important; height: 14px !important; }
+    body.dark-mode .dm-toggle-track::after { transform: translateX(14px) !important; }
+    .dm-toggle { padding: 6px 8px !important; }
+    .dm-toggle-icon { font-size: 13px !important; }
+}
+
+/* Tablet: reduce nav padding */
+@media (max-width: 1024px) {
+    .dm-toggle-label { font-size: 12px; }
+}

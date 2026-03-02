@@ -437,15 +437,37 @@ button { font-family: 'DM Sans', sans-serif; }
 }
 
 @media (max-width: 768px) {
-    .nav-links { display: none; }
-    .hamburger { display: flex; }
+    /* Hide desktop nav links, show hamburger */
+    .nav-links { display: none !important; }
+    .hamburger { display: flex !important; }
+
+    /* Nav inner: tighter on mobile */
+    .nav-inner { padding: 0 4%; gap: 12px; }
+
+    /* Mobile menu sits below navbar */
+    .mobile-menu {
+        position: fixed;
+        top: 68px;
+        left: 0;
+        right: 0;
+        z-index: 999;
+        padding: 16px 5%;
+    }
+
+    /* Footer stacks */
     .footer-inner { grid-template-columns: 1fr; gap: 30px; }
     .footer-links { flex-wrap: wrap; gap: 24px; }
     .form-row { grid-template-columns: 1fr; }
+
+    /* Ensure nav-actions doesn't overflow */
+    .nav-actions { gap: 8px; flex-shrink: 0; }
 }
 
 @media (max-width: 480px) {
     .btn-primary, .btn-secondary, .btn-amber { padding: 9px 16px; font-size: 13px; }
     .fab { bottom: 20px; right: 20px; }
-    .toast { left: 20px; right: 20px; }
+    .toast { left: 16px; right: 16px; width: auto; }
+    .nav-inner { padding: 0 4%; }
+    /* Compact the primary nav button on mobile */
+    .nav-actions .btn-primary { padding: 8px 12px; font-size: 12px; }
 }

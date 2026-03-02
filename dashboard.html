@@ -7,6 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="global.css">
+    <link rel="stylesheet" href="darkmode.css">
     <style>
         .dash-wrap { max-width: 1280px; margin: 0 auto; padding: 90px 5% 60px; }
         
@@ -238,6 +239,11 @@
             <p id="dashDate">Loading date...</p>
         </div>
         <div class="greeting-actions">
+            <button class="dm-toggle" id="dmToggle" title="Toggle Dark Mode (Ctrl+Shift+D)">
+                <span class="dm-toggle-icon">☀️</span>
+                <div class="dm-toggle-track"></div>
+                <span class="dm-toggle-label">Dark Mode</span>
+            </button>
             <a href="analytics.html" class="btn-secondary"><i class="fa-solid fa-chart-pie"></i> Analytics</a>
             <button class="btn-primary" onclick="openModal('addFoodModal')"><i class="fa-solid fa-plus"></i> Log Food</button>
         </div>
@@ -306,7 +312,7 @@
                             </div>
                         </div>
                         <div class="food-card">
-                            <img src="https://bakinghermann.com/wp-content/uploads/2024/11/Dal-Tadka-12.jpg" alt="Dal" loading="lazy">
+                            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSD4dKcPnFlczSSGURgI9-sPaHCHNteNbYAyA&s" alt="Dal" loading="lazy">
                             <div class="food-card-body">
                                 <h4>Dal Tadka</h4>
                                 <p class="meta">3 Servings • Added today</p>
@@ -317,7 +323,7 @@
                             </div>
                         </div>
                         <div class="food-card">
-                            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTxtIKiASGoVcRV3YBXqI1bc7TTfGqDWrqMtA&s" alt="Roti" loading="lazy">
+                            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ7PttQWZ6RSf11x1UnY2VYP3bhHCjrYYxULw&s" alt="Roti" loading="lazy">
                             <div class="food-card-body">
                                 <h4>Leftover Roti</h4>
                                 <p class="meta">4 pieces • Added today</p>
@@ -545,6 +551,8 @@
     const opts = { weekday:'long', year:'numeric', month:'long', day:'numeric' };
     document.getElementById('dashDate').textContent = now.toLocaleDateString('en-IN', opts);
 
+    // The dark mode toggle is handled globally by darkmode.js
+
     // Counters
     const leftovers = document.getElementById('cnt-leftovers');
     const expiring = document.getElementById('cnt-expiring');
@@ -591,5 +599,6 @@
         document.getElementById('foodName').value = '';
     }
 </script>
+<script src="darkmode.js"></script>
 </body>
 </html>

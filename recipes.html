@@ -7,6 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="global.css">
+    <link rel="stylesheet" href="darkmode.css">
     <style>
         .recipes-wrap { max-width: 1280px; margin: 0 auto; padding: 90px 5% 60px; }
         
@@ -328,7 +329,7 @@
 
         <div class="recipe-card" data-name="Roti Pizza" data-diff="easy" data-time="10" data-type="roti">
             <div class="recipe-card-img">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSHcq6uzEWOQYx4ikbb7KPm-vwXg-mHHwQ1nw&s" alt="Roti Pizza" loading="lazy">
+                <img src="https://www.pillsbury.in/wp-content/uploads/2021/09/Roti-Pizza.jpg" alt="Roti Pizza" loading="lazy">
                 <span class="rc-badge">🫓 Uses Roti</span>
                 <button class="rc-save" onclick="toggleSave(this)"><i class="fa-regular fa-heart"></i></button>
             </div>
@@ -349,7 +350,7 @@
 
         <div class="recipe-card" data-name="Dal Paratha" data-diff="medium" data-time="25" data-type="roti">
             <div class="recipe-card-img">
-                <img src="https://rakskitchen.net/wp-content/uploads/2020/03/leftover-dal-paratha-500x375.jpg" alt="Dal Paratha" loading="lazy">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTKus8CX4hIgCuJ90s0K_t1XX3mo9xXVG6kVg&s" alt="Dal Paratha" loading="lazy">
                 <span class="rc-badge">🫘 Uses Dal</span>
                 <button class="rc-save" onclick="toggleSave(this)"><i class="fa-regular fa-heart"></i></button>
             </div>
@@ -370,7 +371,7 @@
 
         <div class="recipe-card" data-name="Paneer Bhurji" data-diff="easy" data-time="12" data-type="rice">
             <div class="recipe-card-img">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSiX63KWCiO2dXI5TxnpSo8gPlpnwQY0zvsJw&s" alt="Paneer Bhurji" loading="lazy">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRl0YBx6LrPsq-uS7Zrbd3EdmiGu1icVh-VMw&s" alt="Paneer Bhurji" loading="lazy">
                 <span class="rc-badge">🧀 Uses Paneer</span>
                 <button class="rc-save" onclick="toggleSave(this)"><i class="fa-regular fa-heart"></i></button>
             </div>
@@ -452,14 +453,14 @@ const recipes = {
     },
     'dal-paratha': {
         title: 'Dal Paratha',
-        img: 'https://rakskitchen.net/wp-content/uploads/2020/03/leftover-dal-paratha-500x375.jpg',
+        img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTKus8CX4hIgCuJ90s0K_t1XX3mo9xXVG6kVg&s',
         time: 25, diff: 'Medium', servings: 4, cal: 340,
         ingredients: ['1 cup Leftover Dal', '2 cups Wheat Flour', 'Salt', 'Oil/Ghee', 'Cumin', 'Green Chilli', 'Coriander'],
         steps: ['Thicken leftover dal by cooking for 5 minutes.', 'Mix flour, salt, and water to make a soft dough.', 'Divide dough into balls, flatten and add dal filling.', 'Seal the edges and roll into parathas.', 'Cook on tawa with ghee until golden on both sides.', 'Serve with yogurt or pickle.']
     },
     'paneer-bhurji': {
         title: 'Paneer Bhurji',
-        img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSiX63KWCiO2dXI5TxnpSo8gPlpnwQY0zvsJw&s',
+        img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRl0YBx6LrPsq-uS7Zrbd3EdmiGu1icVh-VMw&s',
         time: 12, diff: 'Easy', servings: 2, cal: 290,
         ingredients: ['1 bowl Leftover Paneer Curry', '1 Onion', '1 Tomato', 'Spices', 'Coriander', 'Oil'],
         steps: ['Heat oil and sauté onion until translucent.', 'Add tomato and cook until soft.', 'Add the paneer curry and break the paneer into crumbles.', 'Cook for 5 minutes, adjust spices.', 'Garnish with fresh coriander. Serve with roti.']
@@ -523,5 +524,6 @@ function filterRecipes() {
     document.getElementById('recipeCount').textContent = `${visible} recipes found`;
 }
 </script>
+<script src="darkmode.js"></script>
 </body>
 </html>
